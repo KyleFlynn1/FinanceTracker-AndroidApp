@@ -62,6 +62,16 @@ fun FinanceApp(
                 )
             }
             composable("home") {
+                DashboardScreen()
+            }
+            composable("transactions") {
+                TransactionScreen()
+            }
+            composable(route = "addTransaction") {
+                AddTransactionScreen()
+            }
+            composable(route = "editTransaction") {
+                EditTransactionScreen()
             }
         }
     }
