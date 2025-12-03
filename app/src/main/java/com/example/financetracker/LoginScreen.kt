@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -30,11 +31,12 @@ import androidx.compose.ui.unit.sp
 import com.example.financetracker.ui.theme.FinanceTrackerTheme
 
 @Composable
-fun LoginScreen(modifier: Modifier = Modifier) {
+fun LoginScreen(modifier: Modifier = Modifier,
+                onLogin : () -> Unit = {},
+                onRegisterSwitch: () -> Unit = {}) {
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
 
     Column(
         modifier = modifier
@@ -51,7 +53,7 @@ fun LoginScreen(modifier: Modifier = Modifier) {
             modifier = modifier
                 .align(Alignment.CenterHorizontally)
         )
-
+        HorizontalDivider()
         Spacer(Modifier.height(90.dp))
 
         Text(
@@ -81,19 +83,10 @@ fun LoginScreen(modifier: Modifier = Modifier) {
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(Modifier.height(20.dp))
-
-        OutlinedTextField(
-            value = confirmPassword,
-            onValueChange = {confirmPassword = it},
-            label = { Text("Confirm Password")},
-            modifier = Modifier.fillMaxWidth()
-        )
-
         Spacer(Modifier.height(35.dp))
 
         Button(
-            onClick = { onRegister() },
+            onClick = { onLogin() },
             modifier = Modifier
                 .width(160.dp)
                 .height(52.dp),
@@ -101,20 +94,25 @@ fun LoginScreen(modifier: Modifier = Modifier) {
         ) {
             Icon(Icons.Default.Star, contentDescription = null)
             Spacer(Modifier.width(5.dp))
-            Text("Register")
+            Text("Login")
         }
 
         Spacer(Modifier.height(20.dp))
 
         Button(
-            onClick = { onLoginSwitch() },
+            onClick = { onRegisterSwitch() },
             modifier = Modifier
                 .width(250.dp)
                 .height(52.dp),
             shape = RoundedCornerShape(30.dp)
-        ) { Text("Already Registered? Login") }
+        ) { Text("Need To Register?") }
 
     }
+}
+fun onLogin() {
+}
+
+fun onRegisterSwitch() {
 }
 
 @Preview(showBackground = true, showSystemUi = true )

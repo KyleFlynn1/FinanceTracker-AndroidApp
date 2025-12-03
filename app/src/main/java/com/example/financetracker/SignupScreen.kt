@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -30,7 +31,9 @@ import androidx.compose.ui.unit.sp
 import com.example.financetracker.ui.theme.FinanceTrackerTheme
 
 @Composable
-fun SignupScreen(modifier: Modifier = Modifier) {
+fun SignupScreen(modifier: Modifier = Modifier,
+                 onRegister: () -> Unit = {},
+                 onLoginSwitch: () -> Unit = {}) {
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -51,7 +54,7 @@ fun SignupScreen(modifier: Modifier = Modifier) {
             modifier = modifier
                 .align(Alignment.CenterHorizontally)
         )
-
+        HorizontalDivider()
         Spacer(Modifier.height(90.dp))
 
         Text(

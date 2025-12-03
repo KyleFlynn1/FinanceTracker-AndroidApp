@@ -30,6 +30,7 @@ fun FinanceAppBar(
     )
 }
 
+// Actual NavHost composable to add screens and navigation
 @Composable
 fun FinanceApp(
     navController: NavHostController = rememberNavController()
@@ -44,14 +45,21 @@ fun FinanceApp(
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = "signup",
+            startDestination = "login",
             modifier = Modifier.padding(innerPadding)
         ) {
             composable("signup") {
-                SignupScreen()
+                // Signup screen on buttons clicked switch screens
+                SignupScreen(
+                    onRegister = { navController.navigate("home") },
+                    onLoginSwitch = { navController.navigate("login") }
+                )
             }
             composable("login") {
-                LoginScreen()
+                LoginScreen(
+                    onLogin = { navController.navigate("home") },
+                    onRegisterSwitch = { navController.navigate("signup") }
+                )
             }
             composable("home") {
             }
