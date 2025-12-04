@@ -38,7 +38,12 @@ import androidx.compose.ui.unit.sp
 import com.example.financetracker.ui.theme.FinanceTrackerTheme
 
 @Composable
-fun TransactionScreen(modifier: Modifier = Modifier) {
+fun TransactionScreen(modifier: Modifier = Modifier,
+                      onNavigateToHome: () -> Unit = {},
+                      onNavigateToTransactions: () -> Unit = {},
+                      onNavigateToSettings: () -> Unit = {},
+                      onNavigateToAddTransaction: () -> Unit = {},
+                      onNavigateToEditTransaction: () -> Unit = {}) {
 
     var selectedScreen by remember { mutableStateOf("transactions") }
 
@@ -80,7 +85,7 @@ fun TransactionScreen(modifier: Modifier = Modifier) {
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(transactions) { transaction ->
-                TransactionCard(transaction)
+                TransactionCard(transaction, onNavigateToEditTransaction = onNavigateToEditTransaction)
             }
         }
     }
@@ -95,14 +100,16 @@ fun TransactionScreen(modifier: Modifier = Modifier) {
         Spacer(Modifier.height(15.dp))
 
         NavButtons(
-            selectedScreen = selectedScreen,
-            onScreenSelected = {selectedScreen = it}
+            onNavigateToHome = onNavigateToHome,
+            onNavigateToTransactions = onNavigateToTransactions,
+            onNavigateToSettings = onNavigateToSettings,
+            selectedScreen = selectedScreen
         )
 
         // Add transaction button
 
         Button(
-            onClick = { onLogin() },
+            onClick = { onNavigateToAddTransaction() },
             modifier = Modifier
                 .width(240.dp)
                 .height(52.dp),
@@ -116,7 +123,9 @@ fun TransactionScreen(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun TransactionCard(transaction: Transaction) {
+fun TransactionCard(
+    transaction: Transaction,
+                    onNavigateToEditTransaction: () -> Unit = {} ) {
     Card(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -153,7 +162,7 @@ fun TransactionCard(transaction: Transaction) {
             )
 
             Button(
-                onClick = { onLogin() },
+                onClick = { onNavigateToEditTransaction() },
                 modifier = Modifier
                     .width(90.dp)
                     .height(35.dp),

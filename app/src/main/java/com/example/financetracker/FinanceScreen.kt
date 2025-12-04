@@ -62,16 +62,33 @@ fun FinanceApp(
                 )
             }
             composable("home") {
-                DashboardScreen()
+                DashboardScreen(
+                    onNavigateToHome = { navController.navigate("home") },
+                    onNavigateToTransactions = { navController.navigate("transactions") },
+                    onNavigateToSettings = { },
+                    onNavigateToAddTransaction = { navController.navigate("addTransaction") },
+                    onNavigateToEditTransaction = { navController.navigate("editTransaction") }
+                )
             }
             composable("transactions") {
-                TransactionScreen()
+                TransactionScreen(
+                    onNavigateToHome = { navController.navigate("home") },
+                    onNavigateToTransactions = { navController.navigate("transactions") },
+                    onNavigateToSettings = { },
+                    onNavigateToAddTransaction = { navController.navigate("addTransaction") },
+                    onNavigateToEditTransaction = { navController.navigate("editTransaction") }
+                )
             }
             composable(route = "addTransaction") {
-                AddTransactionScreen()
+                AddTransactionScreen(
+                    onSubmitTransaction = { navController.navigate("home") }
+                )
             }
             composable(route = "editTransaction") {
-                EditTransactionScreen()
+                EditTransactionScreen(
+                    onConfirmEdit = { navController.navigate("home") },
+                    onDeleteTransaction = { navController.navigate("home") }
+                )
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.example.financetracker
 
+import android.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
@@ -39,13 +42,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.example.financetracker.ui.theme.FinanceTrackerTheme
 
 @Composable
-fun DashboardScreen(modifier: Modifier = Modifier) {
+fun DashboardScreen(modifier: Modifier = Modifier,
+                    onNavigateToHome: () -> Unit = {},
+                    onNavigateToTransactions: () -> Unit = {},
+                    onNavigateToSettings: () -> Unit = {},
+                    onNavigateToAddTransaction: () -> Unit = {},
+                    onNavigateToEditTransaction: () -> Unit = {} ) {
 
     var selectedScreen by remember { mutableStateOf("dashboard") }
 
+    // Fake Transaction Data for testing before database is added
+    val transactions = remember {
+        listOf(
+            Transaction(1, 12.00, "Withdrawal", "Subscription", "Netflix Subscription", System.currentTimeMillis()),
+            Transaction(2, 25.00, "Withdrawal", "Food", "Lunch at cafe", System.currentTimeMillis())
+        )
+    }
 
     // Values to be used and got from the db
     var balance by remember { mutableStateOf(5153.00) }
@@ -116,7 +132,7 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
         Spacer(Modifier.height(35.dp))
 
         Button(
-            onClick = { onLogin() },
+            onClick = { onNavigateToAddTransaction() },
             modifier = Modifier
                 .width(160.dp)
                 .height(52.dp),
@@ -131,8 +147,10 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
         Spacer(Modifier.height(15.dp))
 
         NavButtons(
-            selectedScreen = selectedScreen,
-            onScreenSelected = {selectedScreen = it}
+            onNavigateToHome = onNavigateToHome,
+            onNavigateToTransactions = onNavigateToTransactions,
+            onNavigateToSettings = onNavigateToSettings,
+            selectedScreen = selectedScreen
         )
 
         // Transaction list
@@ -147,6 +165,13 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
         )
 
         // Transactions function and list here once transaction page is done reuse it
+        LazyColumn(
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(transactions) { transaction ->
+                TransactionCard(transaction, onNavigateToEditTransaction)
+            }
+        }
     }
 }
 
@@ -154,8 +179,11 @@ fun DashboardScreen(modifier: Modifier = Modifier) {
 // Navigation button function
 @Composable
 fun NavButtons(
-    selectedScreen: String,
-    onScreenSelected: (String) -> Unit
+    onNavigateToHome: () -> Unit,
+    onNavigateToTransactions: () -> Unit,
+    onNavigateToSettings: () -> Unit,
+    modifier: Modifier = Modifier,
+    selectedScreen: String
 ) {
     Row(
         modifier = Modifier
@@ -166,7 +194,7 @@ fun NavButtons(
             modifier = Modifier
                 .weight(1f),
             selected = selectedScreen == "dashboard",
-            onClick = { onScreenSelected("dashboard") },
+            onClick = onNavigateToHome,
             label = { Text("Dashboard", fontSize = 10.sp) },
             leadingIcon = { Icon(Icons.Default.Home, contentDescription = null) }
         )
@@ -175,7 +203,7 @@ fun NavButtons(
             modifier = Modifier
                 .weight(1f),
             selected = selectedScreen == "transactions",
-            onClick = { onScreenSelected("transactions") },
+            onClick = onNavigateToTransactions,
             label = { Text("Transactions", fontSize = 10.sp) },
             leadingIcon = { Icon(Icons.Default.Menu, contentDescription = null) }
         )
@@ -184,17 +212,23 @@ fun NavButtons(
             modifier = Modifier
                 .weight(1f),
             selected = selectedScreen == "settings",
-            onClick = { onScreenSelected("settings") },
+            onClick = onNavigateToSettings,
             label = { Text("Settings", fontSize = 10.sp) },
             leadingIcon = { Icon(Icons.Default.Settings, contentDescription = null) }
         )
     }
 }
 
+
 @Preview(showBackground = true, showSystemUi = true )
 @Composable
 fun DashboardPreview() {
     FinanceTrackerTheme {
-        DashboardScreen()
+        DashboardScreen(
+            onNavigateToHome = {},
+            onNavigateToTransactions = {},
+            onNavigateToSettings = {},
+            onNavigateToAddTransaction = {}
+        )
     }
 }

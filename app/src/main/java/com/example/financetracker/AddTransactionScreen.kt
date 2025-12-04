@@ -42,7 +42,8 @@ import androidx.compose.ui.unit.sp
 import com.example.financetracker.ui.theme.FinanceTrackerTheme
 
 @Composable
-fun AddTransactionScreen(modifier: Modifier = Modifier) {
+fun AddTransactionScreen(modifier: Modifier = Modifier,
+                         onSubmitTransaction : () -> Unit = {}) {
 
     var description by remember { mutableStateOf("") }
     var cost by remember { mutableStateOf("") }
@@ -139,7 +140,7 @@ fun AddTransactionScreen(modifier: Modifier = Modifier) {
         Spacer(Modifier.height(20.dp))
 
         Button(
-            onClick = { onLogin() },
+            onClick = { onSubmitTransaction() },
             modifier = Modifier
                 .width(250.dp)
                 .height(52.dp),
