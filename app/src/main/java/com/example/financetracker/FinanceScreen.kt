@@ -65,7 +65,7 @@ fun FinanceApp(
                 DashboardScreen(
                     onNavigateToHome = { navController.navigate("home") },
                     onNavigateToTransactions = { navController.navigate("transactions") },
-                    onNavigateToSettings = { },
+                    onNavigateToSettings = { navController.navigate("settings") },
                     onNavigateToAddTransaction = { navController.navigate("addTransaction") },
                     onNavigateToEditTransaction = { navController.navigate("editTransaction") }
                 )
@@ -74,7 +74,7 @@ fun FinanceApp(
                 TransactionScreen(
                     onNavigateToHome = { navController.navigate("home") },
                     onNavigateToTransactions = { navController.navigate("transactions") },
-                    onNavigateToSettings = { },
+                    onNavigateToSettings = { navController.navigate("settings") },
                     onNavigateToAddTransaction = { navController.navigate("addTransaction") },
                     onNavigateToEditTransaction = { navController.navigate("editTransaction") }
                 )
@@ -88,6 +88,13 @@ fun FinanceApp(
                 EditTransactionScreen(
                     onConfirmEdit = { navController.navigate("home") },
                     onDeleteTransaction = { navController.navigate("home") }
+                )
+            }
+            composable(route = "settings") {
+                SettingsScreen(
+                    onNavigateToHome = { navController.navigate("home") },
+                    onNavigateToTransactions = { navController.navigate("transactions") },
+                    onNavigateToSettings = { navController.navigate("settings") }
                 )
             }
         }
