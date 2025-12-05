@@ -12,6 +12,10 @@ interface TransactionsRepository {
     // Retrieve a Transaction from the given data source that matches with the [id]
     fun getTransactionStream(id: Int): Flow<Transaction?>
 
+    // Retriever a transaction by the type
+    fun getTransactionByTypeStream(type: String): Flow<List<Transaction>>
+
+
     // Insert Transaction in the data source
     suspend fun insertTransaction(transaction: Transaction)
 
