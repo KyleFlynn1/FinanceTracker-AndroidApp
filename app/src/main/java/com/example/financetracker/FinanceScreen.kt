@@ -6,10 +6,21 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.financetracker.transaction.AddTransactionScreen
+import com.example.financetracker.transaction.EditTransactionScreen
+import com.example.financetracker.transaction.TransactionScreen
+import com.example.financetracker.user.LoginScreen
+import com.example.financetracker.user.SignupScreen
+import com.example.financetracker.user.UserViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.financetracker.data.AppContainer
+import com.example.financetracker.data.AppDataContainer
+import com.example.financetracker.user.UserEntryViewModel
 
 // Top app bar composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,6 +46,9 @@ fun FinanceAppBar(
 fun FinanceApp(
     navController: NavHostController = rememberNavController()
 ) {
+    val context = LocalContext.current
+    val app = context.applicationContext as FinanceTrackerApplication
+    val userRepository = app.container.usersRepository
     Scaffold(
         topBar = {
             FinanceAppBar(
@@ -52,13 +66,15 @@ fun FinanceApp(
                 // Signup screen on buttons clicked switch screens
                 SignupScreen(
                     onRegister = { navController.navigate("home") },
-                    onLoginSwitch = { navController.navigate("login") }
+                    onLoginSwitch = { navController.navigate("login") },
+                    userRepository = userRepository
                 )
             }
             composable("login") {
                 LoginScreen(
                     onLogin = { navController.navigate("home") },
-                    onRegisterSwitch = { navController.navigate("signup") }
+                    onRegisterSwitch = { navController.navigate("signup") },
+                    userRepository = userRepository
                 )
             }
             composable("home") {

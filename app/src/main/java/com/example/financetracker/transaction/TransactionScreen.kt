@@ -1,4 +1,4 @@
-package com.example.financetracker
+package com.example.financetracker.transaction
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -35,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.financetracker.NavButtons
 import com.example.financetracker.ui.theme.FinanceTrackerTheme
 import com.example.financetracker.data.Transaction
 

@@ -1,9 +1,7 @@
-package com.example.financetracker
+package com.example.financetracker.transaction
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,12 +12,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -42,8 +36,9 @@ import androidx.compose.ui.unit.sp
 import com.example.financetracker.ui.theme.FinanceTrackerTheme
 
 @Composable
-fun AddTransactionScreen(modifier: Modifier = Modifier,
-                         onSubmitTransaction : () -> Unit = {}) {
+fun EditTransactionScreen(modifier: Modifier = Modifier,
+                          onConfirmEdit : () -> Unit = {},
+                          onDeleteTransaction : () -> Unit = {}) {
 
     var description by remember { mutableStateOf("") }
     var cost by remember { mutableStateOf("") }
@@ -72,7 +67,7 @@ fun AddTransactionScreen(modifier: Modifier = Modifier,
         Spacer(Modifier.height(90.dp))
 
         Text(
-            text = "Add Transaction",
+            text = "Edit Transaction",
             fontSize = 28.sp,
             fontWeight = FontWeight.ExtraBold,
             color = Color.DarkGray,
@@ -140,23 +135,37 @@ fun AddTransactionScreen(modifier: Modifier = Modifier,
         Spacer(Modifier.height(20.dp))
 
         Button(
-            onClick = { onSubmitTransaction() },
+            onClick = { onConfirmEdit() },
             modifier = Modifier
                 .width(250.dp)
                 .height(52.dp),
             shape = RoundedCornerShape(30.dp)
         ) {
-            Icon(Icons.Default.Star, contentDescription = null)
+            Icon(Icons.Default.Check, contentDescription = null)
             Spacer(Modifier.width(5.dp))
-            Text("Submit Transaction")
+            Text("Confirm Edit")
+        }
+
+        Spacer(Modifier.height(20.dp))
+
+        Button(
+            onClick = { onDeleteTransaction() },
+            modifier = Modifier
+                .width(250.dp)
+                .height(52.dp),
+            shape = RoundedCornerShape(30.dp)
+        ) {
+            Icon(Icons.Default.Delete, contentDescription = null)
+            Spacer(Modifier.width(5.dp))
+            Text("Delete Transaction")
         }
     }
 }
 
 @Preview(showBackground = true, showSystemUi = true )
 @Composable
-fun AddTransactionPreview() {
+fun EditTransactionPreview() {
     FinanceTrackerTheme {
-        AddTransactionScreen()
+        EditTransactionScreen()
     }
 }

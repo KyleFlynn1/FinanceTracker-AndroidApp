@@ -1,4 +1,4 @@
-package com.example.financetracker
+package com.example.financetracker.transaction
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -7,14 +7,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,12 +36,16 @@ import androidx.compose.ui.unit.sp
 import com.example.financetracker.ui.theme.FinanceTrackerTheme
 
 @Composable
-fun LoginScreen(modifier: Modifier = Modifier,
-                onLogin : () -> Unit = {},
-                onRegisterSwitch: () -> Unit = {}) {
+fun AddTransactionScreen(modifier: Modifier = Modifier,
+                         onSubmitTransaction : () -> Unit = {}) {
 
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
+    var cost by remember { mutableStateOf("") }
+    var notes by remember { mutableStateOf("") }
+    var type by remember { mutableStateOf("Deposit") }
+
+    // Transaction type button values
+    val options = listOf("Deposit", "Withdrawal")
 
     Column(
         modifier = modifier
@@ -57,7 +66,7 @@ fun LoginScreen(modifier: Modifier = Modifier,
         Spacer(Modifier.height(90.dp))
 
         Text(
-            text = "Login",
+            text = "Add Transaction",
             fontSize = 28.sp,
             fontWeight = FontWeight.ExtraBold,
             color = Color.DarkGray,
@@ -68,57 +77,80 @@ fun LoginScreen(modifier: Modifier = Modifier,
         Spacer(Modifier.height(20.dp))
 
         OutlinedTextField(
-            value = email,
-            onValueChange = {email = it},
-            label = { Text("Email")},
+            value = description,
+            onValueChange = {description = it},
+            label = { Text("Description")},
             modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(Modifier.height(20.dp))
 
         OutlinedTextField(
-            value = password,
-            onValueChange = {password = it},
-            label = { Text("Password")},
+            value = cost,
+            onValueChange = {cost = it},
+            label = { Text("Cost")},
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(Modifier.height(35.dp))
+        Spacer(Modifier.height(20.dp))
 
-        Button(
-            onClick = { onLogin() },
-            modifier = Modifier
-                .width(160.dp)
-                .height(52.dp),
-            shape = RoundedCornerShape(30.dp)
-        ) {
-            Icon(Icons.Default.Star, contentDescription = null)
-            Spacer(Modifier.width(5.dp))
-            Text("Login")
+        OutlinedTextField(
+            value = notes,
+            onValueChange = {notes = it},
+            label = { Text("Notes")},
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(Modifier.height(20.dp))
+
+        Column(modifier = Modifier.padding(16.dp)) {
+            SingleChoiceSegmentedButtonRow(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                options.forEachIndexed { index, label ->
+                    SegmentedButton(
+                        selected = type == label,
+                        onClick = { type = label },
+                        shape = SegmentedButtonDefaults.itemShape(
+                            index = index,
+                            count = options.size
+                        ),
+                        icon = {
+                            if (type == label) {
+                                Icon(
+                                    Icons.Default.Check,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        }
+                    ) {
+                        Text(label)
+                    }
+                }
+            }
         }
 
         Spacer(Modifier.height(20.dp))
 
         Button(
-            onClick = { onRegisterSwitch() },
+            onClick = { onSubmitTransaction() },
             modifier = Modifier
                 .width(250.dp)
                 .height(52.dp),
             shape = RoundedCornerShape(30.dp)
-        ) { Text("Need To Register?") }
-
+        ) {
+            Icon(Icons.Default.Star, contentDescription = null)
+            Spacer(Modifier.width(5.dp))
+            Text("Submit Transaction")
+        }
     }
-}
-fun onLogin() {
-}
-
-fun onRegisterSwitch() {
 }
 
 @Preview(showBackground = true, showSystemUi = true )
 @Composable
-fun LoginPreview() {
+fun AddTransactionPreview() {
     FinanceTrackerTheme {
-        LoginScreen()
+        AddTransactionScreen()
     }
 }
