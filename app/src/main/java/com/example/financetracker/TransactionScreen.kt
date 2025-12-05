@@ -36,6 +36,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.financetracker.ui.theme.FinanceTrackerTheme
+import com.example.financetracker.data.Transaction
 
 @Composable
 fun TransactionScreen(modifier: Modifier = Modifier,
@@ -184,13 +185,3 @@ fun TransactionPreview() {
         TransactionScreen()
     }
 }
-
-// Transaction class
-data class Transaction(
-    val id: Int,
-    val amount: Double,
-    val type: String,
-    val description: String,
-    val notes: String,
-    val date: Long
-)
