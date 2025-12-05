@@ -20,6 +20,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,13 +46,18 @@ fun LoginScreen(
     modifier: Modifier = Modifier,
     onLogin: () -> Unit = {},
     onRegisterSwitch: () -> Unit = {},
-    userRepository: UsersRepository
+    viewModel: UserViewModel
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-    var isLoading by remember { mutableStateOf(false) }
-    val coroutineScope = rememberCoroutineScope()
+    val authUiState by viewModel.authUiState.collectAsState()
+
+    LaunchedEffect(authUiState) {
+        if (authUiState is AuthUiState.LoginSuccess) {
+            onLogin()
+            viewModel.resetAuthState()
+        }
+    }
 
     LoginScreenContent(
         email = email,
@@ -58,26 +65,13 @@ fun LoginScreen(
         onEmailChange = { email = it },
         onPasswordChange = { password = it },
         onLoginClick = {
-            isLoading = true
-            errorMessage = null
-            coroutineScope.launch {
-                try {
-                    val user = userRepository.authenticateUser(email, password)
-                    if (user != null && user.password == password) {
-                        onLogin()
-                    } else {
-                        errorMessage = "Invalid email or password"
-                    }
-                } catch (e: Exception) {
-                    errorMessage = "Login failed: ${e.message}"
-                } finally {
-                    isLoading = false
-                }
-            }
+            viewModel.loginUser(email, password)
         },
         onRegisterClick = onRegisterSwitch,
-        errorMessage = errorMessage,
-        isLoading = isLoading,
+        errorMessage = if (authUiState is AuthUiState.Error) {
+            (authUiState as AuthUiState.Error).message
+        } else null,
+        isLoading = authUiState is AuthUiState.Loading,
         modifier = modifier
     )
 }

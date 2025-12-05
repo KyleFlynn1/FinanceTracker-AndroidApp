@@ -20,6 +20,7 @@ import com.example.financetracker.user.UserViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.financetracker.data.AppContainer
 import com.example.financetracker.data.AppDataContainer
+import com.example.financetracker.ui.AppViewModelProvider
 import com.example.financetracker.user.UserEntryViewModel
 
 // Top app bar composable
@@ -46,9 +47,9 @@ fun FinanceAppBar(
 fun FinanceApp(
     navController: NavHostController = rememberNavController()
 ) {
-    val context = LocalContext.current
-    val app = context.applicationContext as FinanceTrackerApplication
-    val userRepository = app.container.usersRepository
+    // Get View Models
+    val userViewModel: UserViewModel = viewModel(factory = AppViewModelProvider.Factory)
+
     Scaffold(
         topBar = {
             FinanceAppBar(
@@ -67,14 +68,14 @@ fun FinanceApp(
                 SignupScreen(
                     onRegister = { navController.navigate("home") },
                     onLoginSwitch = { navController.navigate("login") },
-                    userRepository = userRepository
+                    viewModel = userViewModel
                 )
             }
             composable("login") {
                 LoginScreen(
                     onLogin = { navController.navigate("home") },
                     onRegisterSwitch = { navController.navigate("signup") },
-                    userRepository = userRepository
+                    viewModel = userViewModel
                 )
             }
             composable("home") {

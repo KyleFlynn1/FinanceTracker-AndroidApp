@@ -20,6 +20,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,14 +45,19 @@ fun SignupScreen(
     modifier: Modifier = Modifier,
     onRegister: () -> Unit = {},
     onLoginSwitch: () -> Unit = {},
-    userRepository: UsersRepository
+    viewModel: UserViewModel
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-    var isLoading by remember { mutableStateOf(false) }
-    val coroutineScope = rememberCoroutineScope()
+    val authUiState by viewModel.authUiState.collectAsState()
+
+    LaunchedEffect(authUiState) {
+        if (authUiState is AuthUiState.RegistrationSuccess) {
+            onRegister()
+            viewModel.resetAuthState()
+        }
+    }
 
     SignupScreenContent(
         email = email,
@@ -60,33 +67,13 @@ fun SignupScreen(
         onPasswordChange = { password = it },
         onConfirmPasswordChange = { confirmPassword = it },
         onRegisterClick = {
-            isLoading = true
-            errorMessage = null
-            coroutineScope.launch {
-                try {
-                    val existingUser = userRepository.authenticateUser(email, password)
-                    if (existingUser != null) {
-                        errorMessage = "Invalid email or password"
-                    } else {
-                        val newUser = User(
-                            id = 0,
-                            email = email,
-                            password = password,
-                            balance = 0.0
-                        )
-                        userRepository.insertUser(newUser)
-                        onRegister()
-                    }
-                } catch (e: Exception) {
-                    errorMessage = "Login failed: ${e.message}"
-                } finally {
-                    isLoading = false
-                }
-            }
+            viewModel.registerUser(email, password, confirmPassword)
         },
         onLoginClick = onLoginSwitch,
-        errorMessage = errorMessage,
-        isLoading = isLoading,
+        errorMessage = if (authUiState is AuthUiState.Error) {
+            (authUiState as AuthUiState.Error).message
+        } else null,
+        isLoading = authUiState is AuthUiState.Loading,
         modifier = modifier
     )
 }
