@@ -84,7 +84,8 @@ fun FinanceApp(
                     onNavigateToTransactions = { navController.navigate("transactions") },
                     onNavigateToSettings = { navController.navigate("settings") },
                     onNavigateToAddTransaction = { navController.navigate("addTransaction") },
-                    onNavigateToEditTransaction = { navController.navigate("editTransaction") }
+                    onNavigateToEditTransaction = { navController.navigate("editTransaction") },
+                    viewModel = userViewModel
                 )
             }
             composable("transactions") {

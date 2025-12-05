@@ -41,6 +41,9 @@ import androidx.compose.ui.unit.sp
 import com.example.financetracker.data.Transaction
 import com.example.financetracker.transaction.TransactionCard
 import com.example.financetracker.ui.theme.FinanceTrackerTheme
+import com.example.financetracker.user.UserViewModel
+import androidx.compose.runtime.collectAsState
+import com.example.financetracker.data.User
 
 @Composable
 fun DashboardScreen(modifier: Modifier = Modifier,
@@ -48,7 +51,8 @@ fun DashboardScreen(modifier: Modifier = Modifier,
                     onNavigateToTransactions: () -> Unit = {},
                     onNavigateToSettings: () -> Unit = {},
                     onNavigateToAddTransaction: () -> Unit = {},
-                    onNavigateToEditTransaction: () -> Unit = {} ) {
+                    onNavigateToEditTransaction: () -> Unit = {},
+                    viewModel: UserViewModel ) {
 
     var selectedScreen by remember { mutableStateOf("dashboard") }
 
@@ -105,7 +109,7 @@ fun DashboardScreen(modifier: Modifier = Modifier,
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
-                    "€$balance",
+                    "€${viewModel.currentUser.collectAsState().value?.balance}",
                     style = MaterialTheme.typography.displayMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -228,11 +232,11 @@ fun NavButtons(
 @Composable
 fun DashboardPreview() {
     FinanceTrackerTheme {
-        DashboardScreen(
+        /*DashboardScreen(
             onNavigateToHome = {},
             onNavigateToTransactions = {},
             onNavigateToSettings = {},
             onNavigateToAddTransaction = {}
-        )
+        )*/
     }
 }
