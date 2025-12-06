@@ -63,7 +63,7 @@ class TransactionViewModel(
     }
 
     // Add transaction for current user
-    fun addTransaction(amount: Double, type: String, description: String, notes: String) {
+    fun addTransaction(amount: Double, type: String, description: String, notes: String, photoPath: String? = null) {
         val userId = currentUserId
         if (userId == null) {
             _transactionUiState.value = TransactionUiState.Error("User not logged in")
@@ -85,7 +85,8 @@ class TransactionViewModel(
                     type = type,
                     description = description,
                     notes = notes,
-                    date = System.currentTimeMillis()
+                    date = System.currentTimeMillis(),
+                    photoPath = photoPath
                 )
 
                 transactionRepository.insertTransaction(newTransaction)
@@ -99,7 +100,7 @@ class TransactionViewModel(
     }
 
     // Update transaction
-    fun updateTransaction(id: Int, amount: Double, type: String, description: String, notes: String) {
+    fun updateTransaction(id: Int, amount: Double, type: String, description: String, notes: String,photoPath: String? = null) {
         val userId = currentUserId
         if (userId == null) {
             _transactionUiState.value = TransactionUiState.Error("User not logged in")
@@ -121,7 +122,8 @@ class TransactionViewModel(
                     type = type,
                     description = description,
                     notes = notes,
-                    date = System.currentTimeMillis()
+                    date = System.currentTimeMillis(),
+                    photoPath = photoPath
                 )
 
                 transactionRepository.updateTransaction(updatedTransaction)

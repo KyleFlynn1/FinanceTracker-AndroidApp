@@ -12,5 +12,6 @@ data class Transaction(
     val type: String,
     val description: String,
     val notes: String,
-    val date: Long
+    val date: Long,
+    val photoPath: String? = null
 )

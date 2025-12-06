@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 // Finance database class with instance objects
-@Database(entities = [User::class, Transaction::class] , version = 1, exportSchema = false)
+@Database(entities = [User::class, Transaction::class] , version = 2, exportSchema = false)
 abstract class FinanceDatabase : RoomDatabase() {
 
     abstract fun userDao(): UserDAO
