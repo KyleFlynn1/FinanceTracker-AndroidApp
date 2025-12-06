@@ -5,6 +5,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.financetracker.FinanceTrackerApplication
+import com.example.financetracker.transaction.TransactionViewModel
 import com.example.financetracker.user.UserViewModel
 import com.example.financetracker.user.UserEntryViewModel
 
@@ -19,6 +20,9 @@ object AppViewModelProvider {
         }
 
         // Transaction View models
+        initializer {
+            TransactionViewModel(financeTrackerApplication().container.transactionsRepository, financeTrackerApplication().container.usersRepository)
+        }
     }
 }
 

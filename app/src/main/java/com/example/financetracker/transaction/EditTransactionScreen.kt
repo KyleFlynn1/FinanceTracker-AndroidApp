@@ -14,14 +14,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,25 +37,112 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.financetracker.data.Transaction
 import com.example.financetracker.ui.theme.FinanceTrackerTheme
 
 @Composable
-fun EditTransactionScreen(modifier: Modifier = Modifier,
-                          onConfirmEdit : () -> Unit = {},
-                          onDeleteTransaction : () -> Unit = {}) {
+fun EditTransactionScreen(
+    modifier: Modifier = Modifier,
+    onConfirmEdit: () -> Unit = {},
+    onDeleteTransaction: () -> Unit = {},
+    viewModel: TransactionViewModel,
+    transactionId: Int
+) {
+    val selectedTransaction by viewModel.selectedTransaction.collectAsState()
+    val transactionUiState by viewModel.transactionUiState.collectAsState()
 
     var description by remember { mutableStateOf("") }
     var cost by remember { mutableStateOf("") }
     var notes by remember { mutableStateOf("") }
-    var type by remember { mutableStateOf("Deposit") }
+    var type by remember { mutableStateOf("Income") }
 
+    // Load transaction when screen opens
+    LaunchedEffect(transactionId) {
+        viewModel.getTransactionById(transactionId)
+    }
+
+    // Populate fields when transaction is loaded
+    LaunchedEffect(selectedTransaction) {
+        selectedTransaction?.let { transaction ->
+            description = transaction.description
+            cost = transaction.amount.toString()
+            notes = transaction.notes
+            type = transaction.type
+        }
+    }
+
+    // Handle success states
+    LaunchedEffect(transactionUiState) {
+        when (transactionUiState) {
+            is TransactionUiState.Success -> {
+                val message = (transactionUiState as TransactionUiState.Success).message
+                if (message.contains("deleted", ignoreCase = true)) {
+                    onDeleteTransaction()
+                } else if (message.contains("updated", ignoreCase = true)) {
+                    onConfirmEdit()
+                }
+                viewModel.resetTransactionState()
+            }
+            else -> {
+
+            }
+        }
+    }
+
+    EditTransactionScreenContent(
+        description = description,
+        cost = cost,
+        notes = notes,
+        type = type,
+        onDescriptionChange = { description = it },
+        onCostChange = { cost = it },
+        onNotesChange = { notes = it },
+        onTypeChange = { type = it },
+        onConfirmEditClick = {
+            val amount = cost.toDoubleOrNull() ?: Double.NaN
+            viewModel.updateTransaction(
+                id = transactionId.toInt(),
+                amount = amount,
+                type = type,
+                description = description,
+                notes = notes
+            )
+        },
+        onDeleteClick = {
+            selectedTransaction?.let { transaction ->
+                viewModel.deleteTransaction(transaction)
+            }
+        },
+        errorMessage = if (transactionUiState is TransactionUiState.Error) {
+            (transactionUiState as TransactionUiState.Error).message
+        } else null,
+        isLoading = transactionUiState is TransactionUiState.Loading,
+        modifier = modifier
+    )
+}
+
+@Composable
+private fun EditTransactionScreenContent(
+    description: String,
+    cost: String,
+    notes: String,
+    type: String,
+    onDescriptionChange: (String) -> Unit,
+    onCostChange: (String) -> Unit,
+    onNotesChange: (String) -> Unit,
+    onTypeChange: (String) -> Unit,
+    onConfirmEditClick: () -> Unit,
+    onDeleteClick: () -> Unit,
+    errorMessage: String?,
+    isLoading: Boolean,
+    modifier: Modifier = Modifier
+) {
     // Transaction type button values
-    val options = listOf("Deposit", "Withdrawal")
+    val options = listOf("Income", "Expense")
 
     Column(
         modifier = modifier
-            .padding(24.dp)
-            .background(Color.White)
+            .padding(12.dp)
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -60,8 +151,7 @@ fun EditTransactionScreen(modifier: Modifier = Modifier,
             fontSize = 32.sp,
             fontWeight = FontWeight.ExtraBold,
             color = Color.DarkGray,
-            modifier = modifier
-                .align(Alignment.CenterHorizontally)
+            modifier = Modifier.align(Alignment.CenterHorizontally)
         )
         HorizontalDivider()
         Spacer(Modifier.height(90.dp))
@@ -71,35 +161,45 @@ fun EditTransactionScreen(modifier: Modifier = Modifier,
             fontSize = 28.sp,
             fontWeight = FontWeight.ExtraBold,
             color = Color.DarkGray,
-            modifier = modifier
-                .align(Alignment.CenterHorizontally)
+            modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 
         Spacer(Modifier.height(20.dp))
 
+        if (errorMessage != null) {
+            Text(
+                text = errorMessage,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+        }
+
         OutlinedTextField(
             value = description,
-            onValueChange = {description = it},
-            label = { Text("Description")},
-            modifier = Modifier.fillMaxWidth()
+            onValueChange = onDescriptionChange,
+            label = { Text("Description") },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isLoading
         )
 
         Spacer(Modifier.height(20.dp))
 
         OutlinedTextField(
             value = cost,
-            onValueChange = {cost = it},
-            label = { Text("Cost")},
-            modifier = Modifier.fillMaxWidth()
+            onValueChange = onCostChange,
+            label = { Text("Amount") },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isLoading
         )
 
         Spacer(Modifier.height(20.dp))
 
         OutlinedTextField(
             value = notes,
-            onValueChange = {notes = it},
-            label = { Text("Notes")},
-            modifier = Modifier.fillMaxWidth()
+            onValueChange = onNotesChange,
+            label = { Text("Notes") },
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isLoading
         )
 
         Spacer(Modifier.height(20.dp))
@@ -111,7 +211,7 @@ fun EditTransactionScreen(modifier: Modifier = Modifier,
                 options.forEachIndexed { index, label ->
                     SegmentedButton(
                         selected = type == label,
-                        onClick = { type = label },
+                        onClick = { onTypeChange(label) },
                         shape = SegmentedButtonDefaults.itemShape(
                             index = index,
                             count = options.size
@@ -124,7 +224,8 @@ fun EditTransactionScreen(modifier: Modifier = Modifier,
                                     modifier = Modifier.size(18.dp)
                                 )
                             }
-                        }
+                        },
+                        enabled = !isLoading
                     ) {
                         Text(label)
                     }
@@ -135,37 +236,38 @@ fun EditTransactionScreen(modifier: Modifier = Modifier,
         Spacer(Modifier.height(20.dp))
 
         Button(
-            onClick = { onConfirmEdit() },
+            onClick = onConfirmEditClick,
             modifier = Modifier
                 .width(250.dp)
                 .height(52.dp),
-            shape = RoundedCornerShape(30.dp)
+            shape = RoundedCornerShape(30.dp),
+            enabled = !isLoading
         ) {
-            Icon(Icons.Default.Check, contentDescription = null)
-            Spacer(Modifier.width(5.dp))
-            Text("Confirm Edit")
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
+            } else {
+                Icon(Icons.Default.Check, contentDescription = null)
+                Spacer(Modifier.width(5.dp))
+                Text("Confirm Edit")
+            }
         }
 
         Spacer(Modifier.height(20.dp))
 
         Button(
-            onClick = { onDeleteTransaction() },
+            onClick = onDeleteClick,
             modifier = Modifier
                 .width(250.dp)
                 .height(52.dp),
-            shape = RoundedCornerShape(30.dp)
+            shape = RoundedCornerShape(30.dp),
+            enabled = !isLoading
         ) {
             Icon(Icons.Default.Delete, contentDescription = null)
             Spacer(Modifier.width(5.dp))
             Text("Delete Transaction")
         }
-    }
-}
-
-@Preview(showBackground = true, showSystemUi = true )
-@Composable
-fun EditTransactionPreview() {
-    FinanceTrackerTheme {
-        EditTransactionScreen()
     }
 }

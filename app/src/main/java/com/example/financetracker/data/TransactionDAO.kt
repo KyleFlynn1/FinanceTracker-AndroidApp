@@ -19,11 +19,27 @@ interface TransactionDAO {
     @Delete
     suspend fun delete(transaction: Transaction)
 
-    @Query("SELECT * from transactions WHERE id = :id")
-    fun getTransaction(id: Int): Flow<Transaction>
+    @Query("SELECT * FROM transactions WHERE id = :id")
+    fun getTransaction(id: Int): Flow<Transaction?>
 
-    @Query("SELECT * from transactions ORDER BY type ASC")
+    @Query("SELECT * FROM transactions ORDER BY date DESC")
     fun getAllTransactions(): Flow<List<Transaction>>
 
+    @Query("SELECT * FROM transactions WHERE userId = :userId ORDER BY date DESC")
+    fun getTransactionsByUserId(userId: Int): Flow<List<Transaction>>
 
+    @Query("SELECT * FROM transactions WHERE userId = :userId AND type = :type ORDER BY date DESC")
+    fun getTransactionsByUserIdAndType(userId: Int, type: String): Flow<List<Transaction>>
+
+    @Query("SELECT SUM(amount) FROM transactions WHERE userId = :userId AND type = 'Income'")
+    fun getTotalIncome(userId: Int): Flow<Double?>
+
+    @Query("SELECT SUM(amount) FROM transactions WHERE userId = :userId AND type = 'Expense'")
+    fun getTotalExpenses(userId: Int): Flow<Double?>
+
+    @Query("SELECT SUM(CASE WHEN type = 'Income' THEN amount ELSE -amount END) FROM transactions WHERE userId = :userId")
+    fun getBalance(userId: Int): Flow<Double?>
+
+    @Query("DELETE FROM transactions WHERE userId = :userId")
+    suspend fun deleteAllTransactionsByUserId(userId: Int)
 }

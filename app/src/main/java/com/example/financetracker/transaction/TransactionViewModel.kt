@@ -4,34 +4,56 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.financetracker.data.Transaction
 import com.example.financetracker.data.TransactionsRepository
+import com.example.financetracker.data.UsersRepository
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class TransactionViewModel(private val transactionRepository: TransactionsRepository) : ViewModel() {
+class TransactionViewModel(
+    private val transactionRepository: TransactionsRepository,
+    private val usersRepository: UsersRepository
+) : ViewModel() {
 
-    // UI state for transaction operations
     private val _transactionUiState = MutableStateFlow<TransactionUiState>(TransactionUiState.Idle)
     val transactionUiState: StateFlow<TransactionUiState> = _transactionUiState.asStateFlow()
 
-    // List of all transactions
     private val _transactions = MutableStateFlow<List<Transaction>>(emptyList())
     val transactions: StateFlow<List<Transaction>> = _transactions.asStateFlow()
 
-    // Currently selected transaction (for viewing/editing)
     private val _selectedTransaction = MutableStateFlow<Transaction?>(null)
     val selectedTransaction: StateFlow<Transaction?> = _selectedTransaction.asStateFlow()
 
-    init {
-        loadTransactions()
+    val totalIncome: StateFlow<Double> = _transactions
+        .map { list -> list.filter { it.type.equals("Income", ignoreCase = true) }.sumOf { it.amount } }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, 0.0)
+
+    val totalExpenses: StateFlow<Double> = _transactions
+        .map { list -> list.filter { it.type.equals("Expense", ignoreCase = true) }.sumOf { it.amount } }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, 0.0)
+
+    val balance: StateFlow<Double> = totalIncome
+        .combine(totalExpenses) { inc, exp -> inc - exp }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, 0.0)
+    // Store the current logged in user ID
+    private var currentUserId: Int? = null
+
+    // Set the current user (call this when user logs in)
+    fun setCurrentUser(userId: Int) {
+        currentUserId = userId
+        loadTransactionsForUser(userId)
     }
 
-    // Load all transactions
-    fun loadTransactions() {
+    // Load transactions for specific user
+    fun loadTransactionsForUser(userId: Int) {
         viewModelScope.launch {
             try {
-                transactionRepository.getAllTransactionsStream().collect { transactionList ->
+                transactionRepository.getTransactionsByUserId(userId).collect { transactionList ->
                     _transactions.value = transactionList
                 }
             } catch (e: Exception) {
@@ -40,8 +62,14 @@ class TransactionViewModel(private val transactionRepository: TransactionsReposi
         }
     }
 
-    // Add a new transaction
+    // Add transaction for current user
     fun addTransaction(amount: Double, type: String, description: String, notes: String) {
+        val userId = currentUserId
+        if (userId == null) {
+            _transactionUiState.value = TransactionUiState.Error("User not logged in")
+            return
+        }
+
         if (!validateTransaction(amount, type, description, notes)) {
             return
         }
@@ -52,6 +80,7 @@ class TransactionViewModel(private val transactionRepository: TransactionsReposi
 
                 val newTransaction = Transaction(
                     id = 0,
+                    userId = userId,  // Link to current user
                     amount = amount,
                     type = type,
                     description = description,
@@ -60,6 +89,7 @@ class TransactionViewModel(private val transactionRepository: TransactionsReposi
                 )
 
                 transactionRepository.insertTransaction(newTransaction)
+                updateUserBalance()
                 _transactionUiState.value = TransactionUiState.Success("Transaction added successfully")
 
             } catch (e: Exception) {
@@ -68,8 +98,14 @@ class TransactionViewModel(private val transactionRepository: TransactionsReposi
         }
     }
 
-    // Update an existing transaction
-    fun updateTransaction(id: Long, amount: Double, type: String, description: String, notes: String) {
+    // Update transaction
+    fun updateTransaction(id: Int, amount: Double, type: String, description: String, notes: String) {
+        val userId = currentUserId
+        if (userId == null) {
+            _transactionUiState.value = TransactionUiState.Error("User not logged in")
+            return
+        }
+
         if (!validateTransaction(amount, type, description, notes)) {
             return
         }
@@ -79,7 +115,8 @@ class TransactionViewModel(private val transactionRepository: TransactionsReposi
                 _transactionUiState.value = TransactionUiState.Loading
 
                 val updatedTransaction = Transaction(
-                    id = 0,
+                    id = id,
+                    userId = userId,
                     amount = amount,
                     type = type,
                     description = description,
@@ -88,6 +125,7 @@ class TransactionViewModel(private val transactionRepository: TransactionsReposi
                 )
 
                 transactionRepository.updateTransaction(updatedTransaction)
+                updateUserBalance()
                 _transactionUiState.value = TransactionUiState.Success("Transaction updated successfully")
 
             } catch (e: Exception) {
@@ -96,12 +134,19 @@ class TransactionViewModel(private val transactionRepository: TransactionsReposi
         }
     }
 
-    // Delete a transaction
+    // Delete transaction
     fun deleteTransaction(transaction: Transaction) {
         viewModelScope.launch {
             try {
+                // Verify transaction belongs to current user
+                if (transaction.userId != currentUserId) {
+                    _transactionUiState.value = TransactionUiState.Error("Unauthorized action")
+                    return@launch
+                }
+
                 _transactionUiState.value = TransactionUiState.Loading
                 transactionRepository.deleteTransaction(transaction)
+                updateUserBalance()
                 _transactionUiState.value = TransactionUiState.Success("Transaction deleted successfully")
             } catch (e: Exception) {
                 _transactionUiState.value = TransactionUiState.Error("Failed to delete transaction: ${e.message}")
@@ -109,7 +154,22 @@ class TransactionViewModel(private val transactionRepository: TransactionsReposi
         }
     }
 
-    // Get transaction by ID
+    // Get transactions by type for current user
+    fun getTransactionsByType(type: String) {
+        val userId = currentUserId ?: return
+
+        viewModelScope.launch {
+            try {
+                transactionRepository.getTransactionsByUserIdAndType(userId, type).collect { transactionList ->
+                    _transactions.value = transactionList
+                }
+            } catch (e: Exception) {
+                _transactionUiState.value = TransactionUiState.Error("Failed to filter transactions: ${e.message}")
+            }
+        }
+    }
+
+    // Get transaction by ID (for editing)
     fun getTransactionById(id: Int) {
         viewModelScope.launch {
             try {
@@ -122,30 +182,44 @@ class TransactionViewModel(private val transactionRepository: TransactionsReposi
         }
     }
 
-    // Select a transaction for editing/viewing
-    fun selectTransaction(transaction: Transaction?) {
-        _selectedTransaction.value = transaction
+    // Calculate balance which is Income - Expenses
+    fun calculateBalance(): Double {
+        return calculateTotalIncome() - calculateTotalExpenses()
     }
 
-    // Get transactions by type (Income/Expense)
-    fun getTransactionsByType(type: String) {
+    private fun updateUserBalance() {
+        val userId = currentUserId ?: return
+
         viewModelScope.launch {
             try {
-                transactionRepository.getTransactionByTypeStream(type).collect { transactionList ->
-                    _transactions.value = transactionList
-                }
+                val currentTransactions = transactionRepository.getTransactionsByUserId(userId).first()
+                val income = currentTransactions
+                    .filter { it.type.equals("Income", ignoreCase = true) }
+                    .sumOf { it.amount }
+                val expenses = currentTransactions
+                    .filter { it.type.equals("Expense", ignoreCase = true) }
+                    .sumOf { it.amount }
+                val newBalance = income - expenses
+                usersRepository.updateUserBalance(userId, newBalance)
             } catch (e: Exception) {
-                _transactionUiState.value = TransactionUiState.Error("Failed to filter transactions: ${e.message}")
             }
         }
     }
 
-    // Calculate total balance
-    fun calculateBalance(): Double {
-        return _transactions.value.sumOf {
-            if (it.type.equals("Income", ignoreCase = true)) it.amount else -it.amount
-        }
+    // Calculate total income
+    fun calculateTotalIncome(): Double {
+        return _transactions.value
+            .filter { it.type.equals("Income", ignoreCase = true) }
+            .sumOf { it.amount }
     }
+
+    // Calculate total expenses
+    fun calculateTotalExpenses(): Double {
+        return _transactions.value
+            .filter { it.type.equals("Expense", ignoreCase = true) }
+            .sumOf { it.amount }
+    }
+
 
     // Validation helper
     private fun validateTransaction(amount: Double, type: String, description: String, notes: String): Boolean {
@@ -164,22 +238,23 @@ class TransactionViewModel(private val transactionRepository: TransactionsReposi
             return false
         }
 
-        // Notes can be optional - remove this check if you want
-        if (notes.isBlank()) {
-            _transactionUiState.value = TransactionUiState.Error("Please enter notes")
-            return false
-        }
-
         return true
     }
 
-    // Reset the UI state
+    // Reset state
     fun resetTransactionState() {
         _transactionUiState.value = TransactionUiState.Idle
     }
+
+    // Clear user data on logout
+    fun clearUserData() {
+        currentUserId = null
+        _transactions.value = emptyList()
+        _selectedTransaction.value = null
+        resetTransactionState()
+    }
 }
 
-// UI state for transaction operations
 sealed class TransactionUiState {
     object Idle : TransactionUiState()
     object Loading : TransactionUiState()

@@ -18,8 +18,11 @@ import com.example.financetracker.user.LoginScreen
 import com.example.financetracker.user.SignupScreen
 import com.example.financetracker.user.UserViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.example.financetracker.data.AppContainer
 import com.example.financetracker.data.AppDataContainer
+import com.example.financetracker.transaction.TransactionViewModel
 import com.example.financetracker.ui.AppViewModelProvider
 import com.example.financetracker.user.UserEntryViewModel
 
@@ -49,15 +52,9 @@ fun FinanceApp(
 ) {
     // Get View Models
     val userViewModel: UserViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    val transactionViewModel: TransactionViewModel = viewModel(factory = AppViewModelProvider.Factory)
 
-    Scaffold(
-        topBar = {
-            FinanceAppBar(
-                canNavigateBack = navController.previousBackStackEntry != null,
-                navigateUp = { navController.navigateUp() }
-            )
-        }
-    ) { innerPadding ->
+    Scaffold(content = { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = "login",
@@ -68,14 +65,16 @@ fun FinanceApp(
                 SignupScreen(
                     onRegister = { navController.navigate("home") },
                     onLoginSwitch = { navController.navigate("login") },
-                    viewModel = userViewModel
+                    viewModel = userViewModel,
+                    transactionViewModel = transactionViewModel
                 )
             }
             composable("login") {
                 LoginScreen(
                     onLogin = { navController.navigate("home") },
                     onRegisterSwitch = { navController.navigate("signup") },
-                    viewModel = userViewModel
+                    viewModel = userViewModel,
+                    transactionViewModel = transactionViewModel
                 )
             }
             composable("home") {
@@ -84,8 +83,9 @@ fun FinanceApp(
                     onNavigateToTransactions = { navController.navigate("transactions") },
                     onNavigateToSettings = { navController.navigate("settings") },
                     onNavigateToAddTransaction = { navController.navigate("addTransaction") },
-                    onNavigateToEditTransaction = { navController.navigate("editTransaction") },
-                    viewModel = userViewModel
+                    onNavigateToEditTransaction = { navController.navigate("editTransaction/${it}") },
+                    viewModel = userViewModel,
+                    transactionViewModel = transactionViewModel
                 )
             }
             composable("transactions") {
@@ -94,18 +94,25 @@ fun FinanceApp(
                     onNavigateToTransactions = { navController.navigate("transactions") },
                     onNavigateToSettings = { navController.navigate("settings") },
                     onNavigateToAddTransaction = { navController.navigate("addTransaction") },
-                    onNavigateToEditTransaction = { navController.navigate("editTransaction") }
+                    onNavigateToEditTransaction = { navController.navigate("editTransaction/${it}") },
+                    viewModel = transactionViewModel
                 )
             }
             composable(route = "addTransaction") {
                 AddTransactionScreen(
-                    onSubmitTransaction = { navController.navigate("home") }
+                    onSubmitTransaction = { navController.navigate("home") },
+                    viewModel = transactionViewModel
                 )
             }
-            composable(route = "editTransaction") {
+            composable(route = "editTransaction/{transactionId}",
+                arguments = listOf(navArgument("transactionId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val transactionId = backStackEntry.arguments?.getInt("transactionId") ?: 0
                 EditTransactionScreen(
                     onConfirmEdit = { navController.navigate("home") },
-                    onDeleteTransaction = { navController.navigate("home") }
+                    onDeleteTransaction = { navController.navigate("home") },
+                    viewModel = transactionViewModel,
+                    transactionId = transactionId
                 )
             }
             composable(route = "settings") {
@@ -116,5 +123,5 @@ fun FinanceApp(
                 )
             }
         }
-    }
+    })
 }

@@ -16,4 +16,7 @@ class OfflineUsersRepository(private val userDao: UserDAO) : UsersRepository {
     override suspend fun authenticateUser(email: String, password: String): User? {
         return userDao.getUserByCredentials(email, password)
     }
+    override suspend fun updateUserBalance(userId: Int, newBalance: Double) {
+        userDao.updateUserBalance(userId, newBalance)
+    }
 }

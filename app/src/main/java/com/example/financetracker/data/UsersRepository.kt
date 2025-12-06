@@ -23,4 +23,8 @@ interface UsersRepository {
 
     // Authenticate user with the email and password
     suspend fun authenticateUser(email: String, password: String): User?
+
+    // Update balancce from transactonis
+    suspend fun updateUserBalance(userId: Int, newBalance: Double)
+
 }

@@ -3,8 +3,10 @@ package com.example.financetracker
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -44,6 +46,7 @@ import com.example.financetracker.ui.theme.FinanceTrackerTheme
 import com.example.financetracker.user.UserViewModel
 import androidx.compose.runtime.collectAsState
 import com.example.financetracker.data.User
+import com.example.financetracker.transaction.TransactionViewModel
 
 @Composable
 fun DashboardScreen(modifier: Modifier = Modifier,
@@ -51,40 +54,29 @@ fun DashboardScreen(modifier: Modifier = Modifier,
                     onNavigateToTransactions: () -> Unit = {},
                     onNavigateToSettings: () -> Unit = {},
                     onNavigateToAddTransaction: () -> Unit = {},
-                    onNavigateToEditTransaction: () -> Unit = {},
-                    viewModel: UserViewModel ) {
+                    onNavigateToEditTransaction: (Int) -> Unit = {},
+                    viewModel: UserViewModel,
+                    transactionViewModel: TransactionViewModel) {
 
     var selectedScreen by remember { mutableStateOf("dashboard") }
 
-    // Fake Transaction Data for testing before database is added
-    val transactions = remember {
-        listOf(
-            Transaction(
-                1,
-                12.00,
-                "Withdrawal",
-                "Subscription",
-                "Netflix Subscription",
-                System.currentTimeMillis()
-            ),
-            Transaction(2, 25.00, "Withdrawal", "Food", "Lunch at cafe", System.currentTimeMillis())
-        )
-    }
+    // Get transacctions for user from the viewmodel
+    val transactions by transactionViewModel.transactions.collectAsState()
+    val currentUser by viewModel.currentUser.collectAsState()
 
     // Values to be used and got from the db
-    var balance by remember { mutableStateOf(5153.00) }
-    var totalIncome by remember { mutableStateOf(1000.00) }
-    var totalExpenses by remember { mutableStateOf(500.00) }
+    val balance = transactionViewModel.calculateBalance()
+    val totalIncome = transactionViewModel.calculateTotalIncome()
+    val totalExpenses = transactionViewModel.calculateTotalExpenses()
 
     Column(
         modifier = modifier
-            .padding(24.dp)
-            .background(Color.White)
+            .padding(16.dp)
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Finance Tracker",
+            text = "Dashboard",
             fontSize = 32.sp,
             fontWeight = FontWeight.ExtraBold,
             color = Color.DarkGray,
@@ -109,7 +101,7 @@ fun DashboardScreen(modifier: Modifier = Modifier,
                     style = MaterialTheme.typography.titleMedium
                 )
                 Text(
-                    "€${viewModel.currentUser.collectAsState().value?.balance}",
+                    "€%.2f".format(balance),
                     style = MaterialTheme.typography.displayMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -123,12 +115,12 @@ fun DashboardScreen(modifier: Modifier = Modifier,
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ){
                     Text(
-                        "+€$totalIncome",
+                        "+€%.2f".format(totalIncome),
                         fontSize = 24.sp,
                         color = Color.Green
                     )
                     Text(
-                        "-€$totalExpenses",
+                        "-€%.2f".format(totalExpenses),
                         fontSize = 24.sp,
                         color = Color.Red
                     )

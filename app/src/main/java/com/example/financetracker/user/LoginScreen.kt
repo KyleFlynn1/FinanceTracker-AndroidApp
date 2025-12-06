@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import com.example.financetracker.data.TransactionsRepository
 import com.example.financetracker.data.UserDAO
 import com.example.financetracker.data.UsersRepository
+import com.example.financetracker.transaction.TransactionViewModel
 import com.example.financetracker.ui.theme.FinanceTrackerTheme
 import kotlinx.coroutines.launch
 
@@ -46,7 +47,8 @@ fun LoginScreen(
     modifier: Modifier = Modifier,
     onLogin: () -> Unit = {},
     onRegisterSwitch: () -> Unit = {},
-    viewModel: UserViewModel
+    viewModel: UserViewModel,
+    transactionViewModel: TransactionViewModel
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -54,6 +56,8 @@ fun LoginScreen(
 
     LaunchedEffect(authUiState) {
         if (authUiState is AuthUiState.LoginSuccess) {
+            val user = (authUiState as AuthUiState.LoginSuccess).user
+            transactionViewModel.setCurrentUser(user.id)
             onLogin()
             viewModel.resetAuthState()
         }
@@ -90,8 +94,7 @@ private fun LoginScreenContent(
 ) {
     Column(
         modifier = modifier
-            .padding(24.dp)
-            .background(Color.White)
+            .padding(16.dp)
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

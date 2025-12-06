@@ -52,8 +52,7 @@ fun SettingsScreen(modifier: Modifier = Modifier,
 
     Column(
         modifier = modifier
-            .padding(24.dp)
-            .background(Color.White)
+            .padding(16.dp)
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

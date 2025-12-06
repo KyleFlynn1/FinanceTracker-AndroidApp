@@ -3,11 +3,13 @@ package com.example.financetracker.transaction
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -24,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,81 +48,83 @@ fun TransactionScreen(modifier: Modifier = Modifier,
                       onNavigateToTransactions: () -> Unit = {},
                       onNavigateToSettings: () -> Unit = {},
                       onNavigateToAddTransaction: () -> Unit = {},
-                      onNavigateToEditTransaction: () -> Unit = {}) {
+                      onNavigateToEditTransaction: (Int) -> Unit = {},
+                      viewModel: TransactionViewModel
+
+) {
 
     var selectedScreen by remember { mutableStateOf("transactions") }
+    // Get transactions from ViewModel
+    val transactions by viewModel.transactions.collectAsState()
 
-    // Fake Transaction Data for testing before database is added
-    val transactions = remember {
-        listOf(
-            Transaction(1, 12.00, "Withdrawal", "Subscription", "Netflix Subscription", System.currentTimeMillis()),
-            Transaction(2, 25.00, "Withdrawal", "Food", "Lunch at cafe", System.currentTimeMillis())
-        )
-    }
     Column(
         modifier = modifier
-            .padding(24.dp)
-            .background(Color.White)
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
+            .fillMaxSize()
+            .background(Color(0xFFF7F7FB))
     ) {
-        Text(
-            text = "Finance Tracker",
-            fontSize = 32.sp,
-            fontWeight = FontWeight.ExtraBold,
-            color = Color.DarkGray,
-            modifier = modifier
-                .align(Alignment.CenterHorizontally)
-        )
-        HorizontalDivider()
+        // Fixed header at top
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.White)
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Transactions",
+                fontSize = 32.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = Color.DarkGray
+            )
+            HorizontalDivider(modifier = Modifier.padding(top = 8.dp, bottom = 8.dp))
+            Text(
+                "Recent Transaction",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.align(Alignment.Start)
+            )
+        }
 
-        // Transaction list
-        Spacer(Modifier.height(25.dp))
-
-        Text(
-            "Recent Transaction",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.align(Alignment.Start)
-        )
-
-        // Transaction cards in list to be got from the database
+        // Scrollable list takes remaining space
         LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(top = 8.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
         ) {
             items(transactions) { transaction ->
                 TransactionCard(transaction, onNavigateToEditTransaction = onNavigateToEditTransaction)
             }
         }
-    }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Bottom)
-    {
-        // Navigation bar from nav button function
-        Spacer(Modifier.height(15.dp))
 
-        NavButtons(
-            onNavigateToHome = onNavigateToHome,
-            onNavigateToTransactions = onNavigateToTransactions,
-            onNavigateToSettings = onNavigateToSettings,
-            selectedScreen = selectedScreen
-        )
-
-        // Add transaction button
-
-        Button(
-            onClick = { onNavigateToAddTransaction() },
+        // Fixed bottom navigation + button
+        Column(
             modifier = Modifier
-                .width(240.dp)
-                .height(52.dp),
-            shape = RoundedCornerShape(30.dp),
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Icon(Icons.Default.AddCircle, contentDescription = null)
-            Spacer(Modifier.width(5.dp))
-            Text("Add Transaction")
+            NavButtons(
+                onNavigateToHome = onNavigateToHome,
+                onNavigateToTransactions = onNavigateToTransactions,
+                onNavigateToSettings = onNavigateToSettings,
+                selectedScreen = selectedScreen
+            )
+
+            Spacer(Modifier.height(12.dp))
+
+            Button(
+                onClick = { onNavigateToAddTransaction() },
+                modifier = Modifier
+                    .width(240.dp)
+                    .height(52.dp),
+                shape = RoundedCornerShape(30.dp),
+            ) {
+                Icon(Icons.Default.AddCircle, contentDescription = null)
+                Spacer(Modifier.width(5.dp))
+                Text("Add Transaction")
+            }
         }
     }
 }
@@ -127,7 +132,7 @@ fun TransactionScreen(modifier: Modifier = Modifier,
 @Composable
 fun TransactionCard(
     transaction: Transaction,
-                    onNavigateToEditTransaction: () -> Unit = {} ) {
+                    onNavigateToEditTransaction: (Int) -> Unit = {} ) {
     Card(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -158,13 +163,13 @@ fun TransactionCard(
             }
 
             Text(
-                "€${transaction.amount}",
+                "€%.2f".format(transaction.amount),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
             )
 
             Button(
-                onClick = { onNavigateToEditTransaction() },
+                onClick = { onNavigateToEditTransaction(transaction.id)},
                 modifier = Modifier
                     .width(90.dp)
                     .height(35.dp),
@@ -183,6 +188,6 @@ fun TransactionCard(
 @Composable
 fun TransactionPreview() {
     FinanceTrackerTheme {
-        TransactionScreen()
+        //TransactionScreen()
     }
 }
