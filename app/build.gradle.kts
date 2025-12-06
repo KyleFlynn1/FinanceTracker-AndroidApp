@@ -64,7 +64,10 @@ dependencies {
     // Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.datastore.core)
+    implementation(libs.androidx.compose.ui.text.google.fonts)
     ksp(libs.androidx.room.compiler)
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     // Testing
     testImplementation(libs.junit)

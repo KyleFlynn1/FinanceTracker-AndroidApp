@@ -8,6 +8,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.core.content.ContextCompat
 import com.example.financetracker.ui.theme.FinanceTrackerTheme
 class MainActivity : ComponentActivity() {
@@ -18,8 +20,11 @@ class MainActivity : ComponentActivity() {
     ) { isGranted: Boolean ->
     }
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val settingsRepository = (application as FinanceTrackerApplication).container.settingsRepository
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
             if (ContextCompat.checkSelfPermission(
@@ -33,7 +38,9 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            FinanceTrackerTheme {
+            val darkMode by settingsRepository.darkMode.collectAsState(initial = false)
+
+            FinanceTrackerTheme (darkTheme = darkMode){
                 FinanceApp()
             }
         }

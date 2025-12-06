@@ -104,20 +104,14 @@ private fun SignupScreenContent(
     ) {
         Text(
             text = "Finance Tracker",
-            fontSize = 32.sp,
-            fontWeight = FontWeight.ExtraBold,
-            color = Color.DarkGray,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            style = MaterialTheme.typography.displayMedium
         )
         HorizontalDivider()
         Spacer(Modifier.height(90.dp))
 
         Text(
             text = "Sign Up",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.ExtraBold,
-            color = Color.DarkGray,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            style = MaterialTheme.typography.displayMedium
         )
 
         Spacer(Modifier.height(20.dp))

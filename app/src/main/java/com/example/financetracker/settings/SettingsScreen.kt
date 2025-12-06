@@ -8,17 +8,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,13 +50,14 @@ fun SettingsScreen(modifier: Modifier = Modifier,
                    onNavigateToTransactions: () -> Unit = {},
                    onNavigateToSettings: () -> Unit = {},
                    onNavigateToLogin: () -> Unit = {},
-                   viewModel: UserViewModel) {
+                   viewModel: UserViewModel,
+                   settingViewModel: SettingViewModel) {
 
-    val settingViewModel: SettingViewModel = viewModel()
     val context = LocalContext.current
-    var selectedScreen by remember { mutableStateOf("settings") }
+    val darkMode by settingViewModel.darkMode.collectAsState()
+    val dailyNotification by settingViewModel.dailyNotification.collectAsState()
 
-    var summaryEnabled by remember { mutableStateOf(true) }
+    var selectedScreen by remember { mutableStateOf("settings") }
 
 
     Column(
@@ -63,45 +68,38 @@ fun SettingsScreen(modifier: Modifier = Modifier,
     ) {
         Text(
             text = "Settings",
-            fontSize = 32.sp,
-            fontWeight = FontWeight.ExtraBold,
-            color = Color.DarkGray,
-            modifier = modifier
-                .align(Alignment.CenterHorizontally)
+            style = MaterialTheme.typography.displayLarge
         )
         HorizontalDivider()
 
         Spacer(Modifier.height(35.dp))
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text("Daily Spend Summary")
-            Switch(
-                checked = summaryEnabled,
-                onCheckedChange = { enabled ->
-                    summaryEnabled = enabled
-                    val userId = viewModel.currentUser.value!!.id
+        // Dark Mode Toggle
+        SettingsSwitch(
+            title = "Dark Mode",
+            description = "Enable dark theme",
+            checked = darkMode,
+            onCheckedChange = { settingViewModel.toggleDarkMode() }
+        )
 
-                    if (enabled) {
-                        settingViewModel.enableDailySummary(context, userId)
-                    } else {
-                        settingViewModel.disableDailySummary(context)
-                    }
+        HorizontalDivider()
 
-                    // Comment out beloww to not have a noti everytime you use switch its very demonstration
+        // Daily Notifications Toggle
+        SettingsSwitch(
+            title = "Daily Notifications",
+            description = "Receive daily financial summaries",
+            checked = dailyNotification,
+            onCheckedChange = { enabled ->
+                viewModel.currentUser.value?.let { user ->
+                    settingViewModel.toggleDailyNotification(context, user.id)
+
                     val testWork = OneTimeWorkRequestBuilder<FinanceWorker>()
-                        .setInputData(workDataOf("USER_ID" to userId))
+                        .setInputData(workDataOf("USER_ID" to user.id))
                         .build()
                     WorkManager.getInstance(context).enqueue(testWork)
-                },
-            )
-        }
-
-        Spacer(Modifier.height(35.dp))
+                }
+            }
+        )
 
         Button(
             onClick = {
@@ -109,13 +107,26 @@ fun SettingsScreen(modifier: Modifier = Modifier,
                 onNavigateToLogin()
             },
             modifier = Modifier
-                .width(160.dp)
-                .height(35.dp),
-            shape = RoundedCornerShape(30.dp)
+                .fillMaxWidth()
+                .height(56.dp)
+                .padding(horizontal = 32.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.error,
+                contentColor = MaterialTheme.colorScheme.onError
+            )
         ) {
-            Icon(Icons.Default.ExitToApp, contentDescription = null)
-            Spacer(Modifier.width(5.dp))
-            Text("Log Out", fontSize = 10.sp)
+            Icon(
+                Icons.Default.ExitToApp,
+                contentDescription = null,
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(Modifier.width(12.dp))
+            Text(
+                "Log Out",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
     Column(
@@ -133,6 +144,38 @@ fun SettingsScreen(modifier: Modifier = Modifier,
             onNavigateToTransactions = onNavigateToTransactions,
             onNavigateToSettings = onNavigateToSettings,
             selectedScreen = selectedScreen
+        )
+    }
+}
+
+@Composable
+fun SettingsSwitch(
+    title: String,
+    description: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange
         )
     }
 }

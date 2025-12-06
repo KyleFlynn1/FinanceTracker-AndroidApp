@@ -19,6 +19,7 @@ import com.example.financetracker.user.UserViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.example.financetracker.settings.SettingViewModel
 import com.example.financetracker.settings.SettingsScreen
 import com.example.financetracker.transaction.TransactionViewModel
 import com.example.financetracker.ui.AppViewModelProvider
@@ -50,6 +51,8 @@ fun FinanceApp(
     // Get View Models
     val userViewModel: UserViewModel = viewModel(factory = AppViewModelProvider.Factory)
     val transactionViewModel: TransactionViewModel = viewModel(factory = AppViewModelProvider.Factory)
+    val settingViewModel: SettingViewModel = viewModel(factory = AppViewModelProvider.Factory)
+
 
     Scaffold(content = { innerPadding ->
         NavHost(
@@ -118,7 +121,8 @@ fun FinanceApp(
                     onNavigateToTransactions = { navController.navigate("transactions") },
                     onNavigateToSettings = { navController.navigate("settings") },
                     onNavigateToLogin = { navController.navigate("login") },
-                    viewModel = userViewModel
+                    viewModel = userViewModel,
+                    settingViewModel = settingViewModel
                 )
             }
         }

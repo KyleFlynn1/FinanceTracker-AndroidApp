@@ -94,26 +94,21 @@ private fun LoginScreenContent(
 ) {
     Column(
         modifier = modifier
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = "Finance Tracker",
-            fontSize = 32.sp,
-            fontWeight = FontWeight.ExtraBold,
-            color = Color.DarkGray,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            style = MaterialTheme.typography.displayMedium
         )
         HorizontalDivider()
         Spacer(Modifier.height(90.dp))
 
         Text(
             text = "Login",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.ExtraBold,
-            color = Color.DarkGray,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            style = MaterialTheme.typography.displayMedium
         )
 
         Spacer(Modifier.height(20.dp))
@@ -130,6 +125,7 @@ private fun LoginScreenContent(
             value = email,
             onValueChange = onEmailChange,
             label = { Text("Email") },
+            shape = RoundedCornerShape(12.dp),
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -139,6 +135,7 @@ private fun LoginScreenContent(
             value = password,
             onValueChange = onPasswordChange,
             label = { Text("Password") },
+            shape = RoundedCornerShape(12.dp),
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth()
         )
@@ -149,8 +146,8 @@ private fun LoginScreenContent(
             onClick = onLoginClick,
             modifier = Modifier
                 .width(160.dp)
-                .height(52.dp),
-            shape = RoundedCornerShape(30.dp),
+                .height(56.dp),
+            shape = RoundedCornerShape(12.dp),
             enabled = !isLoading
         ) {
             if (isLoading) {
@@ -171,8 +168,8 @@ private fun LoginScreenContent(
             onClick = onRegisterClick,
             modifier = Modifier
                 .width(250.dp)
-                .height(52.dp),
-            shape = RoundedCornerShape(30.dp),
+                .height(56.dp),
+            shape = RoundedCornerShape(12.dp),
             enabled = !isLoading
         ) {
             Text("Need To Register?")

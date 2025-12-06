@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -72,16 +73,13 @@ fun DashboardScreen(modifier: Modifier = Modifier,
     Column(
         modifier = modifier
             .padding(16.dp)
+            .background(MaterialTheme.colorScheme.background)
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = "Dashboard",
-            fontSize = 32.sp,
-            fontWeight = FontWeight.ExtraBold,
-            color = Color.DarkGray,
-            modifier = modifier
-                .align(Alignment.CenterHorizontally)
+            style = MaterialTheme.typography.displayLarge
         )
         HorizontalDivider()
 
@@ -89,8 +87,13 @@ fun DashboardScreen(modifier: Modifier = Modifier,
 
         // Balance and income or expense card at top of screen
         Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),
@@ -116,13 +119,13 @@ fun DashboardScreen(modifier: Modifier = Modifier,
                 ){
                     Text(
                         "+€%.2f".format(totalIncome),
-                        fontSize = 24.sp,
-                        color = Color.Green
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        fontWeight = FontWeight.Bold
                     )
                     Text(
                         "-€%.2f".format(totalExpenses),
-                        fontSize = 24.sp,
-                        color = Color.Red
+                        color = MaterialTheme.colorScheme.error,
+                        fontWeight = FontWeight.Bold
                     )
                 }
             }
@@ -192,29 +195,32 @@ fun NavButtons(
     ) {
         FilterChip(
             modifier = Modifier
-                .weight(1f),
+                .weight(1f)
+                .height(48.dp),
             selected = selectedScreen == "dashboard",
             onClick = onNavigateToHome,
-            label = { Text("Dashboard", fontSize = 10.sp) },
-            leadingIcon = { Icon(Icons.Default.Home, contentDescription = null) }
+            label = { Text("Dashboard", fontSize = 11.sp, fontWeight = FontWeight.SemiBold) },
+            leadingIcon = { Icon(Icons.Default.Home, contentDescription = null, modifier = Modifier.size(20.dp)) }
         )
 
         FilterChip(
             modifier = Modifier
-                .weight(1f),
+                .weight(1f)
+                .height(48.dp),
             selected = selectedScreen == "transactions",
             onClick = onNavigateToTransactions,
-            label = { Text("Transactions", fontSize = 10.sp) },
-            leadingIcon = { Icon(Icons.Default.Menu, contentDescription = null) }
+            label = { Text("Transactions", fontSize = 11.sp, fontWeight = FontWeight.SemiBold) },
+            leadingIcon = { Icon(Icons.Default.Menu, contentDescription = null, modifier = Modifier.size(20.dp)) }
         )
 
         FilterChip(
             modifier = Modifier
-                .weight(1f),
+                .weight(1f)
+                .height(48.dp),
             selected = selectedScreen == "settings",
             onClick = onNavigateToSettings,
-            label = { Text("Settings", fontSize = 10.sp) },
-            leadingIcon = { Icon(Icons.Default.Settings, contentDescription = null) }
+            label = { Text("Settings", fontSize = 11.sp, fontWeight = FontWeight.SemiBold) },
+            leadingIcon = { Icon(Icons.Default.Settings, contentDescription = null, modifier = Modifier.size(20.dp)) }
         )
     }
 }

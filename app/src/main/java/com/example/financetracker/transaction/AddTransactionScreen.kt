@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Star
@@ -34,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -111,25 +113,20 @@ private fun AddTransactionScreenContent(
     Column(
         modifier = modifier
             .padding(16.dp)
+            .background(MaterialTheme.colorScheme.background)
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = "Finance Tracker",
-            fontSize = 32.sp,
-            fontWeight = FontWeight.ExtraBold,
-            color = Color.DarkGray,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            style = MaterialTheme.typography.displayMedium
         )
         HorizontalDivider()
         Spacer(Modifier.height(90.dp))
 
         Text(
             text = "Add Transaction",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.ExtraBold,
-            color = Color.DarkGray,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+            style = MaterialTheme.typography.displayMedium
         )
 
         Spacer(Modifier.height(20.dp))
@@ -146,6 +143,7 @@ private fun AddTransactionScreenContent(
             value = description,
             onValueChange = onDescriptionChange,
             label = { Text("Description") },
+            shape = RoundedCornerShape(12.dp),
             modifier = Modifier.fillMaxWidth(),
             enabled = !isLoading
         )
@@ -154,10 +152,19 @@ private fun AddTransactionScreenContent(
 
         OutlinedTextField(
             value = cost,
-            onValueChange = onCostChange,
+            onValueChange = { newValue ->
+                if (newValue.isEmpty() || newValue.matches(Regex("^\\d*\\.?\\d*$"))) {
+                    onCostChange(newValue)
+                }
+            },
             label = { Text("Amount") },
             modifier = Modifier.fillMaxWidth(),
-            enabled = !isLoading
+            enabled = !isLoading,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Decimal
+            ),
+            prefix = { Text("€") },
+            singleLine = true
         )
 
         Spacer(Modifier.height(20.dp))
@@ -208,7 +215,7 @@ private fun AddTransactionScreenContent(
             modifier = Modifier
                 .width(250.dp)
                 .height(52.dp),
-            shape = RoundedCornerShape(30.dp),
+            shape = RoundedCornerShape(12.dp),
             enabled = !isLoading
         ) {
             if (isLoading) {

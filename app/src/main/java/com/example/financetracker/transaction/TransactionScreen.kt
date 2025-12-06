@@ -20,7 +20,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -59,22 +61,17 @@ fun TransactionScreen(modifier: Modifier = Modifier,
 
     Column(
         modifier = modifier
-            .fillMaxSize()
-            .background(Color(0xFFF7F7FB))
-    ) {
+            .fillMaxSize()) {
         // Fixed header at top
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.White)
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = "Transactions",
-                fontSize = 32.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color.DarkGray
+                style = MaterialTheme.typography.displayLarge
             )
             HorizontalDivider(modifier = Modifier.padding(top = 8.dp, bottom = 8.dp))
             Text(
@@ -118,23 +115,32 @@ fun TransactionScreen(modifier: Modifier = Modifier,
                 onClick = { onNavigateToAddTransaction() },
                 modifier = Modifier
                     .width(240.dp)
-                    .height(52.dp),
-                shape = RoundedCornerShape(30.dp),
+                    .height(56.dp), // Increase height
+                shape = RoundedCornerShape(12.dp), // Change from 30.dp
             ) {
-                Icon(Icons.Default.AddCircle, contentDescription = null)
-                Spacer(Modifier.width(5.dp))
-                Text("Add Transaction")
+                Icon(
+                    Icons.Default.AddCircle,
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    "Add Transaction",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }
 }
 
 @Composable
-fun TransactionCard(
-    transaction: Transaction,
+fun TransactionCard(transaction: Transaction,
                     onNavigateToEditTransaction: (Int) -> Unit = {} ) {
     Card(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
         Row(
             modifier = Modifier
@@ -169,15 +175,23 @@ fun TransactionCard(
             )
 
             Button(
-                onClick = { onNavigateToEditTransaction(transaction.id)},
+                onClick = { onNavigateToEditTransaction(transaction.id) },
                 modifier = Modifier
-                    .width(90.dp)
-                    .height(35.dp),
-                shape = RoundedCornerShape(30.dp)
+                    .width(80.dp)
+                    .height(42.dp),
+                shape = RoundedCornerShape(12.dp),
+                contentPadding = PaddingValues(horizontal = 8.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.onTertiary
+                )
             ) {
-                Icon(Icons.Default.AddCircle, contentDescription = null)
-                Spacer(Modifier.width(5.dp))
-                Text("Edit", fontSize = 10.sp)
+                Text(
+                    "Edit",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1
+                )
             }
         }
     }
