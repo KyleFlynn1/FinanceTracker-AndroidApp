@@ -1,6 +1,8 @@
 package com.example.financetracker.data
 
 import kotlinx.coroutines.flow.Flow
+import java.util.Calendar
+import kotlin.text.set
 
 class OfflineTransactionsRepository(private val transactionDao: TransactionDAO) : TransactionsRepository {
 
@@ -23,6 +25,22 @@ class OfflineTransactionsRepository(private val transactionDao: TransactionDAO) 
     override fun getTotalExpenses(userId: Int): Flow<Double?> = transactionDao.getTotalExpenses(userId)
 
     override fun getBalance(userId: Int): Flow<Double?> = transactionDao.getBalance(userId)
+
+    override fun getTodayTotalExpenses(userId: Int): Flow<Double?> { val calendar = Calendar.getInstance()
+        // Set calendar at the satrt of a day
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+        val startOfDay = calendar.timeInMillis
+
+        // Get the end of the day in milliseconds to match the database
+        calendar.add(Calendar.DAY_OF_MONTH, 1)
+        val endOfDay = calendar.timeInMillis
+
+        return transactionDao.getTodayTotalExpenses(userId, startOfDay, endOfDay)
+    }
+
 
     override suspend fun deleteAllTransactionsByUserId(userId: Int) = transactionDao.deleteAllTransactionsByUserId(userId)
 }

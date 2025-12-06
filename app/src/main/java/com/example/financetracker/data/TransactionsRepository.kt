@@ -25,6 +25,11 @@ interface TransactionsRepository {
 
     fun getBalance(userId: Int): Flow<Double?>
 
+    fun getTodayTotalExpenses(userId: Int): Flow<Double?>
+
+
     // User management
     suspend fun deleteAllTransactionsByUserId(userId: Int)
+
+
 }

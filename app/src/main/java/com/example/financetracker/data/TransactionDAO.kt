@@ -40,6 +40,9 @@ interface TransactionDAO {
     @Query("SELECT SUM(CASE WHEN type = 'Income' THEN amount ELSE -amount END) FROM transactions WHERE userId = :userId")
     fun getBalance(userId: Int): Flow<Double?>
 
+    @Query(""" SELECT SUM(amount) FROM transactions WHERE userId = :userId AND type = 'Expense' AND date >= :startOfDay AND date < :endOfDay""")
+    fun getTodayTotalExpenses(userId: Int, startOfDay: Long, endOfDay: Long): Flow<Double?>
+
     @Query("DELETE FROM transactions WHERE userId = :userId")
     suspend fun deleteAllTransactionsByUserId(userId: Int)
 }

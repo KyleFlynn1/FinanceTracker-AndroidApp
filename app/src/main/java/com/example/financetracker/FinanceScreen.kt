@@ -6,7 +6,6 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -20,11 +19,9 @@ import com.example.financetracker.user.UserViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
-import com.example.financetracker.data.AppContainer
-import com.example.financetracker.data.AppDataContainer
+import com.example.financetracker.settings.SettingsScreen
 import com.example.financetracker.transaction.TransactionViewModel
 import com.example.financetracker.ui.AppViewModelProvider
-import com.example.financetracker.user.UserEntryViewModel
 
 // Top app bar composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -119,7 +116,9 @@ fun FinanceApp(
                 SettingsScreen(
                     onNavigateToHome = { navController.navigate("home") },
                     onNavigateToTransactions = { navController.navigate("transactions") },
-                    onNavigateToSettings = { navController.navigate("settings") }
+                    onNavigateToSettings = { navController.navigate("settings") },
+                    onNavigateToLogin = { navController.navigate("login") },
+                    viewModel = userViewModel
                 )
             }
         }
