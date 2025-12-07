@@ -60,7 +60,7 @@ class TransactionViewModelTest {
 
     // Test 1-  Initial state set to IDLE
     @Test
-    fun `initial state should be Idle`() = runTest {
+    fun initialIdleState() = runTest {
         viewModel.transactionUiState.test {
             val state = awaitItem()
             assertTrue(state is TransactionUiState.Idle)
@@ -69,7 +69,7 @@ class TransactionViewModelTest {
 
     // Test 2 - Initial transactions list should be empty
     @Test
-    fun `initial transactions list should be empty`() = runTest {
+    fun initialTransactionsListEmpty() = runTest {
         viewModel.transactions.test {
             val list = awaitItem()
             assertTrue(list.isEmpty())
@@ -82,7 +82,7 @@ class TransactionViewModelTest {
 
     // Test 3 - Add transaction with valid data should succeed
     @Test
-    fun `addTransaction with valid data should succeed`() = runTest {
+    fun addTransactionWithValidData() = runTest {
         // ARRANGE
         val userId = 1
         viewModel.setCurrentUser(userId)
@@ -111,7 +111,7 @@ class TransactionViewModelTest {
 
     // Test 4 - Add transaction with invalid amount should fail
     @Test
-    fun `addTransaction with invalid amount should fail`() = runTest {
+    fun addTransactionWithInvalidAmount() = runTest {
         // ARRANGE
         viewModel.setCurrentUser(1)
 
@@ -135,7 +135,7 @@ class TransactionViewModelTest {
 
     // Test 5 - Add transaction with empty type should fail
     @Test
-    fun `addTransaction with empty description should fail`() = runTest {
+    fun addTransactionWithEmptyType() = runTest {
         // ARRANGE
         viewModel.setCurrentUser(1)
 
@@ -159,7 +159,7 @@ class TransactionViewModelTest {
 
     // Test 6 - Add transaction without logged in user should fail
     @Test
-    fun `addTransaction without logged in user should fail`() = runTest {
+    fun addTransactionWithoutUser() = runTest {
         // ACT
         viewModel.addTransaction(
             amount = 50.0,
@@ -184,7 +184,7 @@ class TransactionViewModelTest {
 
     // Test 7 - Delete transaction should succeed for authorized user
     @Test
-    fun `deleteTransaction should succeed for authorized user`() = runTest {
+    fun deleteTransactionAuthorizedUser() = runTest {
         // ARRANGE
         val userId = 1
         viewModel.setCurrentUser(userId)
@@ -219,7 +219,7 @@ class TransactionViewModelTest {
     // Test 8 - Delete transaction should fail for unauthorized user
 
     @Test
-    fun `deleteTransaction should fail for unauthorized user`() = runTest {
+    fun deleteTransactionUnauthorizedUser() = runTest {
         // ARRANGE
         viewModel.setCurrentUser(1)
 
@@ -252,7 +252,7 @@ class TransactionViewModelTest {
      */
     // Test 9 - Calculate total income should sum all income transactions
     @Test
-    fun `calculateTotalIncome should sum all income transactions`() = runTest {
+    fun calculateTotalIncome() = runTest {
         // ARRANGE
         val userId = 1
         viewModel.setCurrentUser(userId)
@@ -278,7 +278,7 @@ class TransactionViewModelTest {
 
     // Test 10 - Calculate total expenses should sum all expense transactions
     @Test
-    fun `calculateTotalExpenses should sum all expense transactions`() = runTest {
+    fun calculateTotalExpenses() = runTest {
         // ARRANGE
         val userId = 1
         viewModel.setCurrentUser(userId)
@@ -304,7 +304,7 @@ class TransactionViewModelTest {
 
     // Test 11 - Calculate balance should return income minus expenses
     @Test
-    fun `calculateBalance should return income minus expenses`() = runTest {
+    fun calculateBalance() = runTest {
         // ARRANGE
         val userId = 1
         viewModel.setCurrentUser(userId)

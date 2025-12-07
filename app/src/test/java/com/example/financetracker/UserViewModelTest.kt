@@ -56,7 +56,7 @@ class UserViewModelTest {
 
     // Test 1 - Initial state should be set to Idle
     @Test
-    fun `initial authUiState should be Idle`() = runTest {
+    fun initialAuthState() = runTest {
         viewModel.authUiState.test {
             val state = awaitItem()
             assertTrue(state is AuthUiState.Idle)
@@ -65,7 +65,7 @@ class UserViewModelTest {
 
     // Test 2 - No user should be logged in at the beginning
     @Test
-    fun `initial currentUser should be null`() = runTest {
+    fun initialCurrentUser() = runTest {
         viewModel.currentUser.test {
             val user = awaitItem()
             assertNull(user)
@@ -78,7 +78,7 @@ class UserViewModelTest {
 
     // Test 3 - Registration with valid data should succeed
     @Test
-    fun `registerUser with valid data should succeed`() = runTest {
+    fun registerUserWithValidData() = runTest {
         // ARRANGE
         val email = "test@example.com"
         val password = "password123"
@@ -101,7 +101,7 @@ class UserViewModelTest {
 
     // Test 4 - Registration with empty email should fail
     @Test
-    fun `registerUser with empty email should fail`() = runTest {
+    fun registerUserWithEmptyEmailShouldFail() = runTest {
         // ARRANGE
         val email = ""
         val password = "password123"
@@ -122,7 +122,7 @@ class UserViewModelTest {
 
     // Test 5 - Registration with empty password should fail
     @Test
-    fun `registerUser with empty password should fail`() = runTest {
+    fun registerUserWithEmptyPasswordShouldFail() = runTest {
         // ARRANGE
         val email = "test@example.com"
         val password = ""
@@ -143,7 +143,7 @@ class UserViewModelTest {
 
     // Test 6 - Registration with mismatched passwords should fail
     @Test
-    fun `registerUser with mismatched passwords should fail`() = runTest {
+    fun registerUserWithMismatchedPasswordsShouldFail() = runTest {
         // ARRANGE
         val email = "test@example.com"
         val password = "password123"
@@ -164,7 +164,7 @@ class UserViewModelTest {
 
     // Test 7 - Registration with short password should fail
     @Test
-    fun `registerUser with short password should fail`() = runTest {
+    fun registerUserWithShortPasswordShouldFail() = runTest {
         // ARRANGE
         val email = "test@example.com"
         val password = "pass"
@@ -185,7 +185,7 @@ class UserViewModelTest {
 
     // Test 8 - Registration should set loading state during operation
     @Test
-    fun `registerUser should set loading state during operation`() = runTest {
+    fun registerUserShouldSetLoadingState() = runTest {
         // ARRANGE
         val email = "test@example.com"
         val password = "password123"
@@ -205,7 +205,7 @@ class UserViewModelTest {
 
     // Test 9 - Registration should update currentUser on success
     @Test
-    fun `registerUser should update currentUser on success`() = runTest {
+    fun registerUserShouldUpdateUser() = runTest {
         // ARRANGE
         val email = "test@example.com"
         val password = "password123"
@@ -228,7 +228,7 @@ class UserViewModelTest {
 
     // Test 10 - Login with valid credentials should succeed
     @Test
-    fun `loginUser with valid credentials should succeed`() = runTest {
+    fun loginUserWithValidCredentials() = runTest {
         // ARRANGE
         val email = "test@example.com"
         val password = "password123"
@@ -254,7 +254,7 @@ class UserViewModelTest {
 
     // Test 11 - Login with invalid credentials should fail
     @Test
-    fun `loginUser with invalid credentials should fail`() = runTest {
+    fun loginUserWithInvalidCredentials() = runTest {
         // ARRANGE
         val email = "test@example.com"
         val password = "wrongpassword"
@@ -276,7 +276,7 @@ class UserViewModelTest {
 
     // Test 12 - Login with empty email or password should fail
     @Test
-    fun `loginUser with empty email should fail`() = runTest {
+    fun loginUserWithEmptyEmailOrPassword() = runTest {
         // ARRANGE
         val email = ""
         val password = "password123"
@@ -296,7 +296,7 @@ class UserViewModelTest {
 
     // Test 13 - Login with empty password should fail
     @Test
-    fun `loginUser with empty password should fail`() = runTest {
+    fun loginUserWithEmptyPassword() = runTest {
         // ARRANGE
         val email = "test@example.com"
         val password = ""
@@ -316,7 +316,7 @@ class UserViewModelTest {
 
     // Test 14 - Login should set loading state during operation
     @Test
-    fun `loginUser should set loading state during operation`() = runTest {
+    fun loginUserShouldSetLoadingState() = runTest {
         // ARRANGE
         val email = "test@example.com"
         val password = "password123"
@@ -337,7 +337,7 @@ class UserViewModelTest {
 
     // Test 15 - Login should update currentUser on success
     @Test
-    fun `loginUser should update currentUser on success`() = runTest {
+    fun loginUserShouldUpdateUser() = runTest {
         // ARRANGE
         val email = "test@example.com"
         val password = "password123"
@@ -361,7 +361,7 @@ class UserViewModelTest {
 
     // Test 16 - Logout should clear currentUser
     @Test
-    fun `logoutUser should clear currentUser`() = runTest {
+    fun logoutUserShouldClearCurrentUser() = runTest {
         // ARRANGE
         val email = "test@example.com"
         val password = "password123"
@@ -382,7 +382,7 @@ class UserViewModelTest {
 
     // Test 17 - Logout should reset authUiState to Idle
     @Test
-    fun `logoutUser should reset authUiState to Idle`() = runTest {
+    fun logoutUserShouldResetAuthState() = runTest {
         // ARRANGE
         val email = "test@example.com"
         val password = "password123"
@@ -407,7 +407,7 @@ class UserViewModelTest {
 
     // Test 18 - Resetting auth state should set state to Idle
     @Test
-    fun `resetAuthState should set state to Idle`() = runTest {
+    fun resetAuthStateShouldSetAuthStateToIdle() = runTest {
         // ARRANGE
         viewModel.loginUser("", "")
 
@@ -427,7 +427,7 @@ class UserViewModelTest {
 
     // Test 19 - Registration should handle repository exception
     @Test
-    fun `registerUser should handle repository exception`() = runTest {
+    fun registerUserShouldHandleRepositoryException() = runTest {
         // ARRANGE
         val email = "test@example.com"
         val password = "password123"
@@ -449,7 +449,7 @@ class UserViewModelTest {
 
     // Test 20 - Login should handle repository exception
     @Test
-    fun `loginUser should handle repository exception`() = runTest {
+    fun loginUserShouldHandleRepositoryException() = runTest {
         // ARRANGE
         val email = "test@example.com"
         val password = "password123"
