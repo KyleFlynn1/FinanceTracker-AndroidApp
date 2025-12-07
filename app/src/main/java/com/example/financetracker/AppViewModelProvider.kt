@@ -12,6 +12,7 @@ import com.example.financetracker.user.UserEntryViewModel
 
 
 object AppViewModelProvider {
+    // Factory for creating view models that need to access application context
     val Factory = viewModelFactory {
         // User View Models
         initializer {

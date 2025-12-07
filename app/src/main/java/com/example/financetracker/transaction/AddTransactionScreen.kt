@@ -246,6 +246,7 @@ private fun AddTransactionScreenContent(
         )
 
         Spacer(Modifier.height(8.dp))
+
         // Photo button using cameraa captuer
 
         if (photoPath != null && File(photoPath!!).exists()) {

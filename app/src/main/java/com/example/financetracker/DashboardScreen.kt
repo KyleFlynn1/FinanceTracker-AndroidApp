@@ -3,10 +3,8 @@ package com.example.financetracker
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -36,17 +34,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.financetracker.data.Transaction
 import com.example.financetracker.transaction.TransactionCard
 import com.example.financetracker.ui.theme.FinanceTrackerTheme
 import com.example.financetracker.user.UserViewModel
 import androidx.compose.runtime.collectAsState
-import com.example.financetracker.data.User
 import com.example.financetracker.transaction.TransactionViewModel
 
 @Composable
@@ -179,7 +174,7 @@ fun DashboardScreen(modifier: Modifier = Modifier,
 }
 
 
-// Navigation button function
+// Navigation button function to be used in the dashboard screen and reused in other screens
 @Composable
 fun NavButtons(
     onNavigateToHome: () -> Unit,

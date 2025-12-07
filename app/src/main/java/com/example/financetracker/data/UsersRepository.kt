@@ -12,6 +12,10 @@ interface UsersRepository {
     // Retrieve a user from the given data source that matches with the [id]
     fun getUserStream(id: Int): Flow<User?>
 
+    // Get a user by email
+    fun getUserByEmail(email: String): User?
+
+
     // Insert user in the data source
     suspend fun insertUser(user: User)
 
