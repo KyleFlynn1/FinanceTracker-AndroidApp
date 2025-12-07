@@ -56,8 +56,9 @@ class UserViewModel(private val usersRepository: UsersRepository) : ViewModel() 
                 )
 
                 usersRepository.insertUser(newUser)
-                _currentUser.value = newUser
-                _authUiState.value = AuthUiState.RegistrationSuccess(newUser)
+                val actualUser = usersRepository.authenticateUser(email, password)
+                _currentUser.value = actualUser
+                _authUiState.value = AuthUiState.RegistrationSuccess(actualUser!!)
 
             } catch (e: Exception) {
                 _authUiState.value = AuthUiState.Error("Registration failed: ${e.message}")
