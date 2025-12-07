@@ -12,22 +12,24 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.example.financetracker.R
-import com.example.financetracker.data.OfflineTransactionsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
-import com.example.financetracker.data.AppContainer
 import com.example.financetracker.FinanceTrackerApplication
 
 private const val TAG = "FinanceWorker"
 
+// Worker class for the notification
 class FinanceWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ctx, params) {
 
+    // Do work function to be called by the WorkManager
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
+            // Get user id from input data
             val userId = inputData.getInt("USER_ID", -1)
             if (userId == -1) return@withContext Result.failure()
 
+            // Calculate today's total expenses
             val todayTotal = calculateTodayTotal(userId)
             showNotification(todayTotal)
             Result.success()
@@ -36,6 +38,7 @@ class FinanceWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ct
         }
     }
 
+    // Get today's total expenses for a user
     private suspend fun calculateTodayTotal(userId : Int): Double {
         android.util.Log.d(TAG, "Starting calculation for userId: $userId")
 
@@ -48,6 +51,7 @@ class FinanceWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ct
         return total
     }
 
+    // Show a notification with the total expenses for today
     private fun showNotification(total: Double) {
         android.util.Log.d(TAG, "Attempting to show notification for total: $total")
         createNotificationChannel()
@@ -72,6 +76,7 @@ class FinanceWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ct
         }
     }
 
+    // Create a notification channel for the notification
     private fun createNotificationChannel() {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
@@ -87,6 +92,7 @@ class FinanceWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker(ct
         }
     }
 
+    // Companion object to hold constants
     companion object {
         private const val CHANNEL_ID = "daily_summary_channel"
         private const val NOTIFICATION_ID = 1001

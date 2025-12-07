@@ -8,7 +8,6 @@ import com.example.financetracker.FinanceTrackerApplication
 import com.example.financetracker.settings.SettingViewModel
 import com.example.financetracker.transaction.TransactionViewModel
 import com.example.financetracker.user.UserViewModel
-import com.example.financetracker.user.UserEntryViewModel
 
 
 object AppViewModelProvider {
@@ -17,9 +16,6 @@ object AppViewModelProvider {
         // User View Models
         initializer {
             UserViewModel(financeTrackerApplication().container.usersRepository)
-        }
-        initializer {
-            UserEntryViewModel(financeTrackerApplication().container.usersRepository)
         }
 
         // Transaction View models

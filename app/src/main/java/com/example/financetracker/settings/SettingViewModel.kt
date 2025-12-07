@@ -19,24 +19,28 @@ class SettingViewModel(
     private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
+    // Get the current dark mode setting from the repository
     val darkMode = settingsRepository.darkMode.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
         false
     )
 
+    // Get the current daily notification setting from the repository
     val dailyNotification = settingsRepository.dailyNotification.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
         false
     )
 
+    // Toggle the dark mode setting
     fun toggleDarkMode() {
         viewModelScope.launch {
             settingsRepository.setDarkMode(!darkMode.value)
         }
     }
 
+    // Toggle the daily notification setting
     fun toggleDailyNotification(context: Context, userId: Int) {
         viewModelScope.launch {
             val newValue = !dailyNotification.value
@@ -50,6 +54,8 @@ class SettingViewModel(
         }
     }
 
+
+    // Enable daily notification
     private fun enableDailySummary(context: Context, userId: Int) {
         val constraints = Constraints.Builder()
             .setRequiresBatteryNotLow(true)
@@ -72,6 +78,7 @@ class SettingViewModel(
             )
     }
 
+    // Disable daily notification
     private fun disableDailySummary(context: Context) {
         WorkManager.getInstance(context).cancelUniqueWork("daily_notification")
     }
