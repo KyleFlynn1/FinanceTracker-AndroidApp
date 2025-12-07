@@ -17,7 +17,7 @@ class UserViewModel(private val usersRepository: UsersRepository) : ViewModel() 
     val authUiState: StateFlow<AuthUiState> = _authUiState.asStateFlow()
 
     // Currently logged in user saved
-    val _currentUser = MutableStateFlow<User?>(null)
+    private val _currentUser = MutableStateFlow<User?>(null)
     val currentUser: StateFlow<User?> = _currentUser.asStateFlow()
 
     //Register a new user

@@ -83,6 +83,11 @@ class UserViewModelTest {
         val email = "test@example.com"
         val password = "password123"
         val confirmPassword = "password123"
+        val mockUser = User(1, email, password, 0.0)  // ← ADD THIS
+
+        // ← ADD THESE MOCKS
+        whenever(mockRepository.insertUser(any())).thenReturn(Unit)
+        whenever(mockRepository.authenticateUser(email, password)).thenReturn(mockUser)
 
         // ACT
         viewModel.registerUser(email, password, confirmPassword)
@@ -95,7 +100,6 @@ class UserViewModelTest {
             assertEquals(email, (state as AuthUiState.RegistrationSuccess).user.email)
         }
 
-        // Verify repository was called to insert user
         verify(mockRepository, times(1)).insertUser(any())
     }
 
@@ -209,6 +213,11 @@ class UserViewModelTest {
         // ARRANGE
         val email = "test@example.com"
         val password = "password123"
+        val mockUser = User(1, email, password, 0.0)  // ← ADD THIS
+
+        // ← ADD THESE MOCKS
+        whenever(mockRepository.insertUser(any())).thenReturn(Unit)
+        whenever(mockRepository.authenticateUser(email, password)).thenReturn(mockUser)
 
         // ACT
         viewModel.registerUser(email, password, password)
@@ -219,7 +228,8 @@ class UserViewModelTest {
             val user = awaitItem()
             assertNotNull(user)
             assertEquals(email, user?.email)
-            assertEquals(0.0, user?.balance ?: 0.0, 0.01)}
+            assertEquals(0.0, user?.balance ?: 0.0, 0.01)
+        }
     }
 
     /*
